@@ -1,4 +1,5 @@
 JNI_OnLoad
 JNI_OnUnload
-Java_com_cuforge_jni_CuJNI_initialize
+Java_edu_wpi_first_wpilibj_math_DrakeJNI_discreteAlgebraicRiccatiEquation
+Java_edu_wpi_first_wpilibj_math_DrakeJNI_exp
 c_doThing

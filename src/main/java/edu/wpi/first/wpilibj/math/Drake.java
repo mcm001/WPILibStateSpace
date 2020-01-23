@@ -9,6 +9,9 @@ package edu.wpi.first.wpilibj.math;
 
 import org.ejml.simple.SimpleMatrix;
 
+import edu.wpi.first.wpiutil.math.Matrix;
+import edu.wpi.first.wpiutil.math.Num;
+
 public final class Drake {
   /**
    * Solves the discrete alegebraic Riccati equation.

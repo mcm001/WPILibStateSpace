@@ -23,16 +23,13 @@ apply from: 'config.gradle'
 
 // Apply Java configuration
 dependencies {
-    implementation 'edu.wpi.first.cscore:cscore-java:2020.+'
-    implementation 'edu.wpi.first.cameraserver:cameraserver-java:2020.+'
     implementation 'edu.wpi.first.ntcore:ntcore-java:2020.+'
     implementation 'edu.wpi.first.wpilibj:wpilibj-java:2020.+'
     implementation 'edu.wpi.first.wpilibc:wpilibc-cpp:2020.+'
     implementation 'edu.wpi.first.wpiutil:wpiutil-java:2020.+'
     implementation 'edu.wpi.first.wpiutil:wpiutil-cpp:2020.+'
     implementation 'edu.wpi.first.hal:hal-java:2020.+'
-    implementation 'edu.wpi.first.thirdparty.frc2020.opencv:opencv-java:3.4.7-2'
-    implementation "org.ejml:ejml-simple:0.38"
+    compile "org.ejml:ejml-simple:0.38"
 }
 
 // Set up exports properly

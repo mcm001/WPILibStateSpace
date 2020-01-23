@@ -11,11 +11,10 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import edu.wpi.first.wpiutil.RuntimeLoader;
-import edu.wpi.first.wpiutil.WPIUtilJNI;
 
 public final class DrakeJNI {
   static boolean libraryLoaded = false;
-  static RuntimeLoader<WPIUtilJNI> loader = null;
+  static RuntimeLoader<DrakeJNI> loader = null;
 
   public static class Helper {
     private static AtomicBoolean extractOnStaticLoad = new AtomicBoolean(true);
@@ -32,7 +31,7 @@ public final class DrakeJNI {
   static {
     if (Helper.getExtractOnStaticLoad()) {
       try {
-        loader = new RuntimeLoader<>("wpiutiljni", RuntimeLoader.getDefaultExtractionRoot(), WPIUtilJNI.class);
+        loader = new RuntimeLoader<>("drakejni", RuntimeLoader.getDefaultExtractionRoot(), DrakeJNI.class);
         loader.loadLibrary();
       } catch (IOException ex) {
         ex.printStackTrace();
@@ -49,7 +48,7 @@ public final class DrakeJNI {
     if (libraryLoaded) {
       return;
     }
-    loader = new RuntimeLoader<>("wpiutiljni", RuntimeLoader.getDefaultExtractionRoot(), WPIUtilJNI.class);
+    loader = new RuntimeLoader<>("drakejni", RuntimeLoader.getDefaultExtractionRoot(), DrakeJNI.class);
     loader.loadLibrary();
     libraryLoaded = true;
   }
@@ -75,7 +74,7 @@ public final class DrakeJNI {
       double[] S);
 
   /**
-   * Computes the matrix exp
+   * Computes the matrix exp.
    * @param src Array representing the matrix to be exponentiated.
    * @param rows how many rows there are.
    * @param dst where the result will be stored.
