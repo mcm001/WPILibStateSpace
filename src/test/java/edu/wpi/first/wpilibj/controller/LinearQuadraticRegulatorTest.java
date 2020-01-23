@@ -19,13 +19,12 @@ public class LinearQuadraticRegulatorTest {
     public static LinearSystem<N2, N1, N1> elevatorPlant = null;
     static LinearSystem<N2, N1, N1> armPlant = null;
 
-    @Before
-    public static void setUp() {
-        createElevator();
+    static {
         createArm();
+        createElevator();
     }
 
-    private static void createArm() {
+    public static void createArm() {
         var motors = DCMotor.getVex775Pro(2);
 
         var m = 4.0;
@@ -36,7 +35,7 @@ public class LinearQuadraticRegulatorTest {
         armPlant = LinearSystem.createSingleJointedArmSystem(motors, J, G, 12.0);
     }
 
-    private static void createElevator() {
+    public static void createElevator() {
         var motors = DCMotor.getVex775Pro(2);
 
         var m = 5.0;

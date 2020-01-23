@@ -1,31 +1,22 @@
 package edu.wpi.first.wpilibj.estimator;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.databind.jsontype.BasicPolymorphicTypeValidator;
-import com.fasterxml.jackson.databind.jsontype.PolymorphicTypeValidator;
 import edu.wpi.first.wpilibj.controller.LinearQuadraticRegulatorTest;
 import edu.wpi.first.wpilibj.system.LinearSystem;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpiutil.math.MatBuilder;
-import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Nat;
-import edu.wpi.first.wpiutil.math.numbers.N1;
-import edu.wpi.first.wpiutil.math.numbers.N2;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static edu.wpi.first.wpilibj.controller.LinearSystemLoopTest.kDt;
 
 public class KalmanFilterTest {
 
-    @Before
-    public static void setup() {
-        LinearQuadraticRegulatorTest.setUp();
+    static {
+        LinearQuadraticRegulatorTest.createArm();
+        LinearQuadraticRegulatorTest.createElevator();
     }
 
     @Test

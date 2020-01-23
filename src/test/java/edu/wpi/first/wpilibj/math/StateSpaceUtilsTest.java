@@ -42,11 +42,11 @@ public class StateSpaceUtilsTest {
 
     @Test
     public void testIsStabilizable() {
-        var A = new MatBuilder<>(Nat.N2(), Nat.N2())
-                .fill(1.2, 0, 0, 0.5,
-                        1, 0, 0, 0.5,
-                        0.2, 0, 0, 0.5);
-        var B = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(0, 1);
+//        var A = new MatBuilder<>(Nat.N2(), Nat.N2())
+//                .fill(1.2, 0, 0, 0.5,
+//                        1, 0, 0, 0.5,
+//                        0.2, 0, 0, 0.5);
+//        var B = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(0, 1);
     }
 
 }
