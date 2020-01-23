@@ -13,8 +13,8 @@ import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N2;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +23,7 @@ import static edu.wpi.first.wpilibj.controller.LinearSystemLoopTest.kDt;
 
 public class KalmanFilterTest {
 
-    @BeforeAll
+    @Before
     public static void setup() {
         LinearQuadraticRegulatorTest.setUp();
     }

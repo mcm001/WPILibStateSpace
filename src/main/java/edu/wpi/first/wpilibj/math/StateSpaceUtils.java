@@ -1,5 +1,6 @@
 package edu.wpi.first.wpilibj.math;
 
+import edu.wpi.first.wpilibj.util.Pair;
 import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.Num;
@@ -80,7 +81,7 @@ public class StateSpaceUtils {
      * @param dtSeconds    Discretization timestep.
      * @return a pair representing the discrete system matrix and process noise covariance matrix.
      */
-    public static <States extends Num> SimpleMatrixUtils.Pair<Matrix<States, States>, Matrix<States, States>> discretizeAQTaylor(
+    public static <States extends Num> Pair<Matrix<States, States>, Matrix<States, States>> discretizeAQTaylor(
             Matrix<States, States> contA, Matrix<States, States> contQ, double dtSeconds
     ) {
 
@@ -109,7 +110,7 @@ public class StateSpaceUtils {
         // Make Q symmetric if it isn't already
         var discQ = (Q.plus(Q.transpose()).div(2.0));
 
-        return new SimpleMatrixUtils.Pair<Matrix<States, States>, Matrix<States, States>>(discA, discQ);
+        return new Pair<>(discA, discQ);
     }
 
     /**

@@ -23,13 +23,18 @@ apply from: 'config.gradle'
 
 // Apply Java configuration
 dependencies {
-    implementation 'edu.wpi.first.ntcore:ntcore-java:2020.+'
-    implementation 'edu.wpi.first.wpilibj:wpilibj-java:2020.+'
-    implementation 'edu.wpi.first.wpilibc:wpilibc-cpp:2020.+'
-    implementation 'edu.wpi.first.wpiutil:wpiutil-java:2020.+'
-    implementation 'edu.wpi.first.wpiutil:wpiutil-cpp:2020.+'
-    implementation 'edu.wpi.first.hal:hal-java:2020.+'
-    compile "org.ejml:ejml-simple:0.38"
+  implementation 'edu.wpi.first.ntcore:ntcore-java:2020.+'
+  implementation 'edu.wpi.first.wpilibj:wpilibj-java:2020.+'
+  implementation 'edu.wpi.first.wpilibc:wpilibc-cpp:2020.+'
+  implementation 'edu.wpi.first.wpiutil:wpiutil-java:2020.+'
+  implementation 'edu.wpi.first.wpiutil:wpiutil-cpp:2020.+'
+  implementation 'edu.wpi.first.hal:hal-java:2020.+'
+  implementation "org.ejml:ejml-simple:0.38"
+  implementation "com.fasterxml.jackson.core:jackson-annotations:2.10.0"
+  implementation "com.fasterxml.jackson.core:jackson-core:2.10.0"
+  implementation "com.fasterxml.jackson.core:jackson-databind:2.10.0"
+
+  testImplementation('junit:junit:4.13')
 }
 
 // Set up exports properly
@@ -86,7 +91,7 @@ model {
         }
       }
 
-       nativeUtils.useRequiredLibrary(it, "driver_shared")
+      nativeUtils.useRequiredLibrary(it, "driver_shared")
     }
   }
 }

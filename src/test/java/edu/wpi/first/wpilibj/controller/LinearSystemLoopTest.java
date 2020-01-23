@@ -9,10 +9,13 @@ import edu.wpi.first.wpiutil.math.*;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N2;
 import org.ejml.simple.SimpleMatrix;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.Assert;
+import org.junit.Test;
 
 import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class LinearSystemLoopTest {
 
@@ -71,11 +74,11 @@ public class LinearSystemLoopTest {
             update(m_loop, (random.nextDouble() - 0.5) * kPositionStddev);
             var u = m_loop.getU(0);
 
-            Assertions.assertTrue(u >= -12 && u <= 12.0);
+            assertTrue(u >= -12 && u <= 12.0);
         }
 
-        Assertions.assertEquals(2.0, m_loop.getXHat(0), 0.05);
-        Assertions.assertEquals(0.0, m_loop.getXHat(1), 0.5);
+        assertEquals(2.0, m_loop.getXHat(0), 0.05);
+        assertEquals(0.0, m_loop.getXHat(1), 0.5);
 
     }
 
@@ -85,15 +88,15 @@ public class LinearSystemLoopTest {
         Matrix<N2, N1> references = new MatBuilder<>(Nat.N2(), Nat.N1()).fill(2.0, 0.0);
         m_loop.setNextR(references);
 
-        Assertions.assertEquals(0.0, m_loop.getXHat(0), 1e-6);
-        Assertions.assertEquals(0.0, m_loop.getXHat(1), 1e-6);
+        Assert.assertEquals(0.0, m_loop.getXHat(0), 1e-6);
+        Assert.assertEquals(0.0, m_loop.getXHat(1), 1e-6);
 
         for (int i = 0; i < 100; i++) {
             update(m_loop, 0.0);
         }
 
-        Assertions.assertEquals(0.0, m_loop.getXHat(0), 1e-6);
-        Assertions.assertEquals(0.0, m_loop.getXHat(1), 1e-6);
+        Assert.assertEquals(0.0, m_loop.getXHat(0), 1e-6);
+        Assert.assertEquals(0.0, m_loop.getXHat(1), 1e-6);
     }
 
 }

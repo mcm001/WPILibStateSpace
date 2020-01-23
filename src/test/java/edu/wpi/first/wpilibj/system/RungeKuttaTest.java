@@ -3,9 +3,9 @@ package edu.wpi.first.wpilibj.system;
 import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import org.ejml.simple.SimpleMatrix;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.Assert.assertEquals;
 
 public class RungeKuttaTest {
 

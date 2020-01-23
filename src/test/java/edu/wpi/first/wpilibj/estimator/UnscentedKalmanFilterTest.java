@@ -9,7 +9,7 @@ import edu.wpi.first.wpiutil.math.numbers.N2;
 import edu.wpi.first.wpiutil.math.numbers.N3;
 import edu.wpi.first.wpiutil.math.numbers.N5;
 import org.ejml.simple.SimpleMatrix;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
 public class UnscentedKalmanFilterTest {
 
