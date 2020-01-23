@@ -46,19 +46,39 @@ Java_edu_wpi_first_wpilibj_math_DrakeJNI_discreteAlgebraicRiccatiEquation
   (JNIEnv* env, jclass, jdoubleArray A, jdoubleArray B, jdoubleArray Q,
    jdoubleArray R, jint states, jint inputs, jdoubleArray S)
 {
+
+  jboolean isCopyA;
+  jboolean isCopyB;
+  jboolean isCopyQ;
+  jboolean isCopyR;
+
   Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, 
-                                  Eigen::RowMajor>> Amat{env->GetDoubleArrayElements(A, nullptr), 
+                                  Eigen::RowMajor>> Amat{env->GetDoubleArrayElements(A, &isCopyA), 
                                   states, states};
   Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, 
-                                  Eigen::RowMajor>> Bmat{env->GetDoubleArrayElements(B, nullptr),                                states, inputs};
+                                  Eigen::RowMajor>> Bmat{env->GetDoubleArrayElements(B, &isCopyB),                                states, inputs};
   Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, 
-                                  Eigen::RowMajor>> Qmat{env->GetDoubleArrayElements(Q, nullptr),                                states, states};
+                                  Eigen::RowMajor>> Qmat{env->GetDoubleArrayElements(Q, &isCopyQ),                                states, states};
   Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, 
-                                  Eigen::RowMajor>> Rmat{env->GetDoubleArrayElements(R, nullptr),                                inputs, inputs};
+                                  Eigen::RowMajor>> Rmat{env->GetDoubleArrayElements(R, &isCopyR),                                inputs, inputs};
   Eigen::MatrixXd result =
       drake::math::DiscreteAlgebraicRiccatiEquation(Amat, Bmat, Qmat, Rmat);
 
   env->SetDoubleArrayRegion(S, 0, states * states, result.data());
+
+  if (isCopyA == JNI_TRUE) {
+      env -> ReleaseDoubleArrayElements(jarray, A, JNI_ABORT);
+  }
+  if (isCopyB == JNI_TRUE) {
+      env -> ReleaseDoubleArrayElements(jarray, B, JNI_ABORT);
+  }
+  if (isCopyQ == JNI_TRUE) {
+      env -> ReleaseDoubleArrayElements(jarray, Q, JNI_ABORT);
+  }
+  if (isCopyR == JNI_TRUE) {
+      env -> ReleaseDoubleArrayElements(jarray, R, JNI_ABORT);
+  }
+
 }
 
 /*
