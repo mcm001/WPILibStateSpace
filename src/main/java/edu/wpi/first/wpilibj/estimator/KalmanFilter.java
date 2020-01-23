@@ -199,7 +199,7 @@ public class KalmanFilter<States extends Num, Inputs extends Num,
         // K^T = S^T.solve(CP^T)
         // K = (S^T.solve(CP^T))^T
 
-        SimpleMatrix K = SimpleMatrixUtils.lltDecompose(S.transpose().getStorage())
+        SimpleMatrix K = StateSpaceUtils.lltDecompose(S.transpose().getStorage())
                 .solve((C.times(m_P.transpose())).getStorage()).transpose();
 
         m_plant.setX(

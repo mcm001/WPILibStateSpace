@@ -144,7 +144,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num,
      */
     public void update(Matrix<States, N1> x) {
         if(m_enabled) {
-            m_u = m_K.times(m_r.minus(x)).plus(new Matrix<>(SimpleMatrixUtils.householderQrDecompose(m_B.getStorage()).solve((m_r.minus(m_A.times(m_r))).getStorage())));
+            m_u = m_K.times(m_r.minus(x)).plus(new Matrix<>(StateSpaceUtils.householderQrDecompose(m_B.getStorage()).solve((m_r.minus(m_A.times(m_r))).getStorage())));
         }
     }
 
@@ -158,7 +158,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num,
         if(m_enabled) {
             Matrix<States, N1> error = m_r.minus(x);
             Matrix<Inputs, N1> feedBack = m_K.times(error);
-            Matrix<Inputs, N1> feedForward = new Matrix<>(SimpleMatrixUtils.householderQrDecompose(m_B.getStorage()).solve((nextR.minus(m_A.times(m_r))).getStorage()));
+            Matrix<Inputs, N1> feedForward = new Matrix<>(StateSpaceUtils.householderQrDecompose(m_B.getStorage()).solve((nextR.minus(m_A.times(m_r))).getStorage()));
 
             m_u = feedBack.plus(feedForward);
             m_r = nextR;

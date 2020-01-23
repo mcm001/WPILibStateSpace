@@ -1,5 +1,6 @@
 package edu.wpi.first.wpilibj.estimator;
 
+import edu.wpi.first.wpilibj.util.Pair;
 import edu.wpi.first.wpiutil.math.*;
 import edu.wpi.first.wpilibj.math.StateSpaceUtils;
 import edu.wpi.first.wpiutil.math.numbers.N1;
@@ -142,7 +143,7 @@ public class UnscentedKalmanFilter<States extends Num, Inputs extends Num,
 //        m_P -= K * Py * K.transpose();
     }
 
-    public static <S extends Num, CovDim extends Num> SimpleMatrixUtils.Pair<Matrix<N1, CovDim>, Matrix<CovDim, CovDim>> unscentedTransform(
+    public static <S extends Num, CovDim extends Num> Pair<Matrix<N1, CovDim>, Matrix<CovDim, CovDim>> unscentedTransform(
             S s, CovDim dim, Matrix sigmas, Matrix Wm, Matrix Wc, Matrix noiseCov
     ) {
         if(sigmas.getNumCols() != 2 * s.getNum() + 1 || sigmas.getNumCols() != dim.getNum())

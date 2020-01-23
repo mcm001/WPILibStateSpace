@@ -1,5 +1,6 @@
 package edu.wpi.first.wpilibj.estimator;
 
+import edu.wpi.first.wpilibj.math.StateSpaceUtils;
 import edu.wpi.first.wpiutil.math.*;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import org.ejml.data.DMatrixRMaj;
@@ -78,7 +79,7 @@ public class MerweScaledSigmaPoints<States extends Num> {
         int states = m_states.getNum();
 
         var intermediate = P.times(lambda + m_states.getNum()).getStorage();//.llt().matrixL();
-        var U = SimpleMatrixUtils.lltDecompose(intermediate);
+        var U = StateSpaceUtils.lltDecompose(intermediate);
 
         // 2 * states + 1 by states
         SimpleMatrix sigmas = new SimpleMatrix(2 * m_states.getNum() + 1, m_states.getNum());
