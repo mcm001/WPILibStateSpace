@@ -12,12 +12,12 @@ plugins {
 def nativeName = "wpilibStateSpace"
 
 ext {
-    baseId = nativeName
-    groupId = "edu.wpi.first.${nativeName}"
+  baseId = nativeName
+  groupId = "edu.wpi.first.${nativeName}"
 }
 
 ext.getCurrentArch = {
-    return NativePlatforms.desktop
+  return NativePlatforms.desktop
 }
 
 repositories {
@@ -113,31 +113,31 @@ model {
       nativeUtils.useRequiredLibrary(it, "driver_shared")
     }
 
-  // By default, a development executable will be generated. This is to help the case of
-  // testing specific functionality of the library.
-  WPILibStateSpaceDev(NativeExecutableSpec) {
+    // By default, a development executable will be generated. This is to help the case of
+    // testing specific functionality of the library.
+    WPILibStateSpaceDev(NativeExecutableSpec) {
       targetBuildTypes 'debug'
       sources {
-          cpp {
-              source {
-                  srcDirs 'src/dev/native/cpp'
-                  include '**/*.cpp'
-              }
-              exportedHeaders {
-                  srcDir 'src/main/native/include'
-                  if (project.hasProperty('generatedHeaders')) {
-                      srcDir generatedHeaders
-                  }
-              }
+        cpp {
+          source {
+            srcDirs 'src/dev/native/cpp'
+            include '**/*.cpp'
           }
+          exportedHeaders {
+            srcDir 'src/main/native/include'
+            if (project.hasProperty('generatedHeaders')) {
+              srcDir generatedHeaders
+            }
+          }
+        }
       }
       binaries.all {
-          lib library: 'WPILibStateSpace', linkage: 'shared'
-          lib library: 'WPILibStateSpaceDriver', linkage: 'shared'
+        lib library: 'WPILibStateSpace', linkage: 'shared'
+        lib library: 'WPILibStateSpaceDriver', linkage: 'shared'
 
-          nativeUtils.useRequiredLibrary(it, "driver_shared")
+        nativeUtils.useRequiredLibrary(it, "driver_shared")
       }
-  }
+    }
   }
 
   tasks {
@@ -151,21 +151,21 @@ model {
         println it
         println it.name
         if (it in NativeExecutableSpec && it.name == "WPILibStateSpaceDev") {
-            it.binaries.each {
-              if (!found) {
-                def arch = it.targetPlatform.name
-                if (arch == systemArch) {
-                  dependsOn it.tasks.install
-                  commandLine it.tasks.install.runScriptFile.get().asFile.toString()
-                  def filePath = it.tasks.install.installDirectory.get().toString() + File.separatorChar + 'lib'
-                  test.dependsOn it.tasks.install
-                  test.systemProperty 'java.library.path', filePath
-                  test.environment 'LD_LIBRARY_PATH', filePath
-                  test.workingDir filePath
+          it.binaries.each {
+            if (!found) {
+              def arch = it.targetPlatform.name
+              if (arch == systemArch) {
+                dependsOn it.tasks.install
+                commandLine it.tasks.install.runScriptFile.get().asFile.toString()
+                def filePath = it.tasks.install.installDirectory.get().toString() + File.separatorChar + 'lib'
+                test.dependsOn it.tasks.install
+                test.systemProperty 'java.library.path', filePath
+                test.environment 'LD_LIBRARY_PATH', filePath
+                test.workingDir filePath
 
-                  found = true
-                }
+                found = true
               }
+            }
           }
         }
       }
