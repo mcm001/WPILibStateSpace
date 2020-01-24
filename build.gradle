@@ -112,7 +112,6 @@ model {
 
       nativeUtils.useRequiredLibrary(it, "driver_shared")
     }
-  }
 
   // By default, a development executable will be generated. This is to help the case of
   // testing specific functionality of the library.
@@ -123,8 +122,6 @@ model {
               source {
                   srcDirs 'src/dev/native/cpp'
                   include '**/*.cpp'
-                  lib library: WPILibStateSpaceDriver
-                  lib library: WPILibStateSpaceD
               }
               exportedHeaders {
                   srcDir 'src/main/native/include'
@@ -135,12 +132,12 @@ model {
           }
       }
       binaries.all {
-          lib library: WPILibStateSpace, linkage: 'shared'
-          lib library: WPILibStateSpaceDriver, linkage: 'shared'
-          lib library: WPILibStateSpaceJNIShared, linkage: 'shared'
+          lib library: 'WPILibStateSpace', linkage: 'shared'
+          lib library: 'WPILibStateSpaceDriver', linkage: 'shared'
 
           nativeUtils.useRequiredLibrary(it, "driver_shared")
       }
+  }
   }
 
   tasks {
@@ -151,6 +148,8 @@ model {
       def found = false
       def systemArch = getCurrentArch()
       c.each {
+        println it
+        println it.name
         if (it in NativeExecutableSpec && it.name == "WPILibStateSpaceDev") {
             it.binaries.each {
               if (!found) {
@@ -163,10 +162,6 @@ model {
                   test.systemProperty 'java.library.path', filePath
                   test.environment 'LD_LIBRARY_PATH', filePath
                   test.workingDir filePath
-                  run.dependsOn it.tasks.install
-                  run.systemProperty 'java.library.path', filePath
-                  run.environment 'LD_LIBRARY_PATH', filePath
-                  run.workingDir filePath
 
                   found = true
                 }
