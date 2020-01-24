@@ -1,3 +1,4 @@
+import edu.wpi.first.toolchain.*
 
 plugins {
   id 'cpp'
@@ -6,6 +7,17 @@ plugins {
   id 'edu.wpi.first.NativeUtils' version  '2020.7.2' //'2019.5.15' //'2020.1.0'
   id 'edu.wpi.first.GradleJni' version '0.10.1'
   id 'edu.wpi.first.GradleVsCode' version '0.12.0'
+}
+
+def nativeName = "wpilibStateSpace"
+
+ext {
+    baseId = nativeName
+    groupId = "edu.wpi.first.${nativeName}"
+}
+
+ext.getCurrentArch = {
+    return NativePlatforms.desktop
 }
 
 repositories {
@@ -23,14 +35,18 @@ apply from: 'config.gradle'
 
 // Apply Java configuration
 dependencies {
-  implementation 'edu.wpi.first.ntcore:ntcore-java:2020.+'
-  implementation 'edu.wpi.first.wpilibj:wpilibj-java:2020.+'
-  implementation 'edu.wpi.first.wpilibc:wpilibc-cpp:2020.+'
-
-  implementation 'edu.wpi.first.wpiutil:wpiutil-java:2020.+'
-  implementation 'edu.wpi.first.wpiutil:wpiutil-cpp:2020.+'
-  
-  implementation 'edu.wpi.first.hal:hal-java:2020.+'
+  // implementation 'edu.wpi.first.ntcore:ntcore-java:2020.+'
+  // implementation 'edu.wpi.first.wpilibj:wpilibj-java:2020.+'
+  // implementation 'edu.wpi.first.wpilibc:wpilibc-cpp:2020.+'
+  // implementation 'edu.wpi.first.wpiutil:wpiutil-java:2020.+'
+  // implementation 'edu.wpi.first.wpiutil:wpiutil-cpp:2020.+'
+  // implementation 'edu.wpi.first.hal:hal-java:2020.+'
+  implementation 'edu.wpi.first.ntcore:ntcore-java:2020.2.2'
+  implementation 'edu.wpi.first.wpilibj:wpilibj-java:2020.2.2'
+  implementation 'edu.wpi.first.wpilibc:wpilibc-cpp:2020.2.2'
+  implementation 'edu.wpi.first.wpiutil:wpiutil-java:2020.2.2'
+  implementation 'edu.wpi.first.wpiutil:wpiutil-cpp:2020.2.2'
+  implementation 'edu.wpi.first.hal:hal-java:2020.2.2'
 
   implementation "org.ejml:ejml-simple:0.38"
   implementation "com.fasterxml.jackson.core:jackson-annotations:2.10.0"
@@ -95,6 +111,39 @@ model {
       }
 
       nativeUtils.useRequiredLibrary(it, "driver_shared")
+    }
+  }
+  tasks {
+    def c = $.components
+    project.tasks.create('runCpp', Exec) {
+      group = 'WPILib'
+      description = "Run the ${nativeName}Dev executable"
+      def found = false
+      def systemArch = getCurrentArch()
+      c.each {
+        if (it in NativeExecutableSpec && it.name == "${nativeName}Dev") {
+            it.binaries.each {
+              if (!found) {
+                def arch = it.targetPlatform.name
+                if (arch == systemArch) {
+                  dependsOn it.tasks.install
+                  commandLine it.tasks.install.runScriptFile.get().asFile.toString()
+                  def filePath = it.tasks.install.installDirectory.get().toString() + File.separatorChar + 'lib'
+                  test.dependsOn it.tasks.install
+                  test.systemProperty 'java.library.path', filePath
+                  test.environment 'LD_LIBRARY_PATH', filePath
+                  test.workingDir filePath
+                  run.dependsOn it.tasks.install
+                  run.systemProperty 'java.library.path', filePath
+                  run.environment 'LD_LIBRARY_PATH', filePath
+                  run.workingDir filePath
+
+                  found = true
+                }
+              }
+          }
+        }
+      }
     }
   }
 }
