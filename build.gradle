@@ -1,12 +1,12 @@
 import edu.wpi.first.toolchain.*
 
 plugins {
-  id 'cpp'
-  id 'java'
-  id 'edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin' version '2020.2'
-  id 'edu.wpi.first.NativeUtils' version  '2020.7.2' //'2019.5.15' //'2020.1.0'
-  id 'edu.wpi.first.GradleJni' version '0.10.1'
-  id 'edu.wpi.first.GradleVsCode' version '0.12.0'
+    id 'cpp'
+    id 'java'
+    id 'edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin' version '2020.2'
+    id 'edu.wpi.first.NativeUtils' version  '2020.7.2' //'2019.5.15' //'2020.1.0'
+    id 'edu.wpi.first.GradleJni' version '0.10.1'
+    id 'edu.wpi.first.GradleVsCode' version '0.12.0'
 }
 
 def nativeName = "wpilibStateSpace"
@@ -21,13 +21,13 @@ ext.getCurrentArch = {
 }
 
 repositories {
-  mavenCentral()
+    mavenCentral()
 }
 
 if (project.hasProperty('releaseMode')) {
-  wpilibRepositories.addAllReleaseRepositories(project)
+    wpilibRepositories.addAllReleaseRepositories(project)
 } else {
-  wpilibRepositories.addAllDevelopmentRepositories(project)
+    wpilibRepositories.addAllDevelopmentRepositories(project)
 }
 
 // Apply C++ configuration
@@ -35,151 +35,150 @@ apply from: 'config.gradle'
 
 // Apply Java configuration
 dependencies {
-  // implementation 'edu.wpi.first.ntcore:ntcore-java:2020.+'
-  // implementation 'edu.wpi.first.wpilibj:wpilibj-java:2020.+'
-  // implementation 'edu.wpi.first.wpilibc:wpilibc-cpp:2020.+'
-  // implementation 'edu.wpi.first.wpiutil:wpiutil-java:2020.+'
-  // implementation 'edu.wpi.first.wpiutil:wpiutil-cpp:2020.+'
-  // implementation 'edu.wpi.first.hal:hal-java:2020.+'
-  implementation 'edu.wpi.first.ntcore:ntcore-java:2020.2.2'
-  implementation 'edu.wpi.first.wpilibj:wpilibj-java:2020.2.2'
-  implementation 'edu.wpi.first.wpilibc:wpilibc-cpp:2020.2.2'
-  implementation 'edu.wpi.first.wpiutil:wpiutil-java:2020.2.2'
-  implementation 'edu.wpi.first.wpiutil:wpiutil-cpp:2020.2.2'
-  implementation 'edu.wpi.first.hal:hal-java:2020.2.2'
+    // implementation 'edu.wpi.first.ntcore:ntcore-java:2020.+'
+    // implementation 'edu.wpi.first.wpilibj:wpilibj-java:2020.+'
+    // implementation 'edu.wpi.first.wpilibc:wpilibc-cpp:2020.+'
+    // implementation 'edu.wpi.first.wpiutil:wpiutil-java:2020.+'
+    // implementation 'edu.wpi.first.wpiutil:wpiutil-cpp:2020.+'
+    // implementation 'edu.wpi.first.hal:hal-java:2020.+'
+    implementation 'edu.wpi.first.ntcore:ntcore-java:2020.2.2'
+    implementation 'edu.wpi.first.wpilibj:wpilibj-java:2020.2.2'
+    implementation 'edu.wpi.first.wpilibc:wpilibc-cpp:2020.2.2'
+    implementation 'edu.wpi.first.wpiutil:wpiutil-java:2020.2.2'
+    implementation 'edu.wpi.first.wpiutil:wpiutil-cpp:2020.2.2'
+    implementation 'edu.wpi.first.hal:hal-java:2020.2.2'
 
-  implementation "org.ejml:ejml-simple:0.38"
-  implementation "com.fasterxml.jackson.core:jackson-annotations:2.10.0"
-  implementation "com.fasterxml.jackson.core:jackson-core:2.10.0"
-  implementation "com.fasterxml.jackson.core:jackson-databind:2.10.0"
+    implementation "org.ejml:ejml-simple:0.38"
+    implementation "com.fasterxml.jackson.core:jackson-annotations:2.10.0"
+    implementation "com.fasterxml.jackson.core:jackson-core:2.10.0"
+    implementation "com.fasterxml.jackson.core:jackson-databind:2.10.0"
 
-  testImplementation('junit:junit:4.13')
+    testImplementation('junit:junit:4.13')
 }
 
 // Set up exports properly
 nativeUtils {
-  exportsConfigs {
-    // Main library is just default empty. This will export everything
-    WPILibStateSpace {
+    exportsConfigs {
+        // Main library is just default empty. This will export everything
+        WPILibStateSpace {
+        }
     }
-  }
-  privateExportsConfigs {
-    // Only export explicit symbols from driver library
-    WPILibStateSpaceDriver {
-      exportsFile = project.file("src/main/driver/symbols.txt")
+    privateExportsConfigs {
+        // Only export explicit symbols from driver library
+        WPILibStateSpaceDriver {
+            exportsFile = project.file("src/main/driver/symbols.txt")
+        }
     }
-  }
 }
 
 model {
-  components {
-    WPILibStateSpace(NativeLibrarySpec) {
-      sources {
-        cpp {
-          source {
-            srcDirs 'src/main/native/cpp'
-            include '**/*.cpp'
-          }
-          exportedHeaders {
-            srcDirs 'src/main/native/include'
-          }
-        }
-      }
-      binaries.all {
-        lib library: 'WPILibStateSpaceDriver', linkage: 'shared'
-      }
-      nativeUtils.useRequiredLibrary(it, 'wpilib_shared')
-    }
-
-    WPILibStateSpaceDriver(JniNativeLibrarySpec) {
-      enableCheckTask true
-      javaCompileTasks << compileJava
-      jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
-      // Leave these for future proofing
-      jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.raspbian)
-      jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.aarch64bionic)
-      sources {
-        cpp {
-          source {
-            srcDirs 'src/main/driver/cpp'
-            include '**/*.cpp'
-          }
-          exportedHeaders {
-            srcDirs 'src/main/driver/include'
-          }
-        }
-      }
-
-      nativeUtils.useRequiredLibrary(it, "driver_shared")
-    }
-  }
-
-  // By default, a development executable will be generated. This is to help the case of
-  // testing specific functionality of the library.
-  WPILibStateSpaceDev(NativeExecutableSpec) {
-      targetBuildTypes 'debug'
-      sources {
-          cpp {
-              source {
-                  srcDirs 'src/dev/native/cpp'
-                  include '**/*.cpp'
-                  lib library: WPILibStateSpaceDriver
-                  lib library: WPILibStateSpaceD
-              }
-              exportedHeaders {
-                  srcDir 'src/main/native/include'
-                  if (project.hasProperty('generatedHeaders')) {
-                      srcDir generatedHeaders
-                  }
-              }
-          }
-      }
-      binaries.all {
-          lib library: WPILibStateSpace, linkage: 'shared'
-          lib library: WPILibStateSpaceDriver, linkage: 'shared'
-          lib library: WPILibStateSpaceJNIShared, linkage: 'shared'
-
-          nativeUtils.useRequiredLibrary(it, "driver_shared")
-      }
-  }
-
-  tasks {
-    def c = $.components
-    project.tasks.create('runCpp', Exec) {
-      group = 'WPILib'
-      description = "Run the WPILibStateSpaceDev executable"
-      def found = false
-      def systemArch = getCurrentArch()
-      c.each {
-        if (it in NativeExecutableSpec && it.name == "WPILibStateSpaceDev") {
-            it.binaries.each {
-              if (!found) {
-                def arch = it.targetPlatform.name
-                if (arch == systemArch) {
-                  dependsOn it.tasks.install
-                  commandLine it.tasks.install.runScriptFile.get().asFile.toString()
-                  def filePath = it.tasks.install.installDirectory.get().toString() + File.separatorChar + 'lib'
-                  test.dependsOn it.tasks.install
-                  test.systemProperty 'java.library.path', filePath
-                  test.environment 'LD_LIBRARY_PATH', filePath
-                  test.workingDir filePath
-                  run.dependsOn it.tasks.install
-                  run.systemProperty 'java.library.path', filePath
-                  run.environment 'LD_LIBRARY_PATH', filePath
-                  run.workingDir filePath
-
-                  found = true
+    components {
+        WPILibStateSpace(NativeLibrarySpec) {
+            sources {
+                cpp {
+                    source {
+                        srcDirs 'src/main/native/cpp'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/native/include'
+                    }
                 }
-              }
-          }
+            }
+            binaries.all {
+                lib library: 'WPILibStateSpaceDriver', linkage: 'shared'
+            }
+            nativeUtils.useRequiredLibrary(it, 'wpilib_shared')
         }
-      }
+
+        WPILibStateSpaceDriver(JniNativeLibrarySpec) {
+            enableCheckTask true
+            javaCompileTasks << compileJava
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.roborio)
+            // Leave these for future proofing
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.raspbian)
+            jniCrossCompileOptions << JniCrossCompileOptions(nativeUtils.wpi.platforms.aarch64bionic)
+            sources {
+                cpp {
+                    source {
+                        srcDirs 'src/main/driver/cpp'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDirs 'src/main/driver/include'
+                    }
+                }
+            }
+
+            nativeUtils.useRequiredLibrary(it, "driver_shared")
+        }
+
+        // By default, a development executable will be generated. This is to help the case of
+        // testing specific functionality of the library.
+        WPILibStateSpaceDev(NativeExecutableSpec) {
+            targetBuildTypes 'debug'
+            sources {
+                cpp {
+                    source {
+                        srcDirs 'src/dev/native/cpp'
+                        include '**/*.cpp'
+                    }
+                    exportedHeaders {
+                        srcDir 'src/main/native/include'
+                        if (project.hasProperty('generatedHeaders')) {
+                            srcDir generatedHeaders
+                        }
+                    }
+                }
+            }
+            binaries.all {
+                lib library: 'WPILibStateSpace', linkage: 'shared'
+                lib library: 'WPILibStateSpaceDriver', linkage: 'shared'
+
+                nativeUtils.useRequiredLibrary(it, "driver_shared")
+
+                if (nativeName == 'hal' && it.targetPlatform.name == nativeUtils.wpi.platforms.roborio) {
+                    nativeUtils.useRequiredLibrary(it, 'netcomm_shared', 'chipobject_shared', 'visa_shared', 'ni_runtime_shared')
+                }
+            }
+        }
     }
-  }
+
+    tasks {
+        def c = $.components
+        project.tasks.create('runCpp', Exec) {
+            group = 'WPILib'
+            description = "Run the WPILibStateSpaceDev executable"
+            def found = false
+            def systemArch = getCurrentArch()
+            c.each {
+                // println it
+                // println it.name
+                if (it in NativeExecutableSpec && it.name == "WPILibStateSpaceDev") {
+                    it.binaries.each {
+                        if (!found) {
+                            def arch = it.targetPlatform.name
+                            if (arch == systemArch) {
+                                dependsOn it.tasks.install
+                                commandLine it.tasks.install.runScriptFile.get().asFile.toString()
+                                def filePath = it.tasks.install.installDirectory.get().toString() + File.separatorChar + 'lib'
+                                test.dependsOn it.tasks.install
+                                test.systemProperty 'java.library.path', filePath
+                                test.environment 'LD_LIBRARY_PATH', filePath
+                                test.workingDir filePath
+
+                                found = true
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
 
 apply from: 'publish.gradle'
 
 wrapper {
-  gradleVersion '6.0'
+    gradleVersion '6.0'
 }

@@ -1,18 +1,18 @@
 {
-    "fileName": "LibCu.json",
-    "name": "LibCu",
+    "fileName": "wpilibStateSpace.json",
+    "name": "wpilibStateSpace",
     "version": "    020.2.1",
     "uuid": "libcufrc-e6e8-4db6-89f0-copperforge0", 
     "mavenUrls": [
         "https://morley3dprinting.com/dev/files/maven"
     ],
-    "jsonUrl": "https://morley3dprinting.com/dev/files/vendordeps/LibCu-latest.json",
+    "jsonUrl": "https://morley3dprinting.com/dev/files/vendordeps/wpilibStateSpace-latest.json",
     "cppDependencies": [
         {
             "groupId": "edu.wpi.first.wpilibStateSpace",
             "artifactId": "WPILibStateSpace-cpp",
             "version": "2020.2.1",
-            "libName": "Cu",
+            "libName": "wpilibStateSpace",
             "headerClassifier": "headers",
             "sharedLibrary": true,
             "skipInvalidPlatforms": true,
@@ -23,7 +23,7 @@
         },
         {
             "groupId": "edu.wpi.first.wpilibStateSpace",
-            "artifactId": "LibCu-driver",
+            "artifactId": "wpilibStateSpace-driver",
             "version": "2020.2.1",
             "libName": "CuDriver",
             "headerClassifier": "headers",
