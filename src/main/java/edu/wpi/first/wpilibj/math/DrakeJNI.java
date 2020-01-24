@@ -31,7 +31,7 @@ public final class DrakeJNI {
   static {
     if (Helper.getExtractOnStaticLoad()) {
       try {
-        loader = new RuntimeLoader<>("wpilibstatespace", RuntimeLoader.getDefaultExtractionRoot(), DrakeJNI.class);
+        loader = new RuntimeLoader<>("wpilibStateSpace", RuntimeLoader.getDefaultExtractionRoot(), DrakeJNI.class);
         loader.loadLibrary();
       } catch (IOException ex) {
         ex.printStackTrace();
@@ -48,7 +48,7 @@ public final class DrakeJNI {
     if (libraryLoaded) {
       return;
     }
-    loader = new RuntimeLoader<>("drakejni", RuntimeLoader.getDefaultExtractionRoot(), DrakeJNI.class);
+    loader = new RuntimeLoader<>("wpilibStateSpace", RuntimeLoader.getDefaultExtractionRoot(), DrakeJNI.class);
     loader.loadLibrary();
     libraryLoaded = true;
   }
