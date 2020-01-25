@@ -47,46 +47,72 @@ Java_edu_wpi_first_wpilibj_math_DrakeJNI_discreteAlgebraicRiccatiEquation
    jdoubleArray R, jint states, jint inputs, jdoubleArray S)
 {
 
-  jboolean isCopyA;
-  jboolean isCopyB;
-  jboolean isCopyQ;
-  jboolean isCopyR;
-
-  jdouble* Aelms = env->GetDoubleArrayElements(A, &isCopyA);
-  jdouble* Belms = env->GetDoubleArrayElements(A, &isCopyB);
-  jdouble* Qelms = env->GetDoubleArrayElements(A, &isCopyQ);
-  jdouble* Relms = env->GetDoubleArrayElements(A, &isCopyR);
-
-  Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, 
-                                  Eigen::RowMajor>> Amat{Aelms, 
+  Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
+                                  Eigen::RowMajor>> Amat{env->GetDoubleArrayElements(A, nullptr),
                                   states, states};
-  Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, 
-                                  Eigen::RowMajor>> Bmat{Belms,                                
-                                  states, inputs};
-  Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, 
-                                  Eigen::RowMajor>> Qmat{Qelms,
-                                  states, states};
-  Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, 
-                                  Eigen::RowMajor>> Rmat{Relms,
-                                  inputs, inputs};
-
+  Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
+                                  Eigen::RowMajor>> Bmat{env->GetDoubleArrayElements(B, nullptr),                                states, inputs};
+  Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
+                                  Eigen::RowMajor>> Qmat{env->GetDoubleArrayElements(Q, nullptr),                                states, states};
+  Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
+                                  Eigen::RowMajor>> Rmat{env->GetDoubleArrayElements(R, nullptr),                                inputs, inputs};
   Eigen::MatrixXd result =
       drake::math::DiscreteAlgebraicRiccatiEquation(Amat, Bmat, Qmat, Rmat);
 
   env->SetDoubleArrayRegion(S, 0, states * states, result.data());
 
-  if (isCopyA == JNI_TRUE) {
-      env -> ReleaseDoubleArrayElements(A, Aelms, JNI_ABORT);
-  }
-  if (isCopyB == JNI_TRUE) {
-      env -> ReleaseDoubleArrayElements(B, Belms, JNI_ABORT);
-  }
-  if (isCopyQ == JNI_TRUE) {
-      env -> ReleaseDoubleArrayElements(Q, Qelms, JNI_ABORT);
-  }
-  if (isCopyR == JNI_TRUE) {
-      env -> ReleaseDoubleArrayElements(R, Relms, JNI_ABORT);
-  }
+//  jboolean isCopyA;
+//  jboolean isCopyB;
+//  jboolean isCopyQ;
+//  jboolean isCopyR;
+//
+//  jdouble* Aelms = env->GetDoubleArrayElements(A, &isCopyA);
+//  jdouble* Belms = env->GetDoubleArrayElements(A, &isCopyB);
+//  jdouble* Qelms = env->GetDoubleArrayElements(A, &isCopyQ);
+//  jdouble* Relms = env->GetDoubleArrayElements(A, &isCopyR);
+//
+//  std::cout << *Aelms << std::endl;
+//  std::cout << *Aelms << std::endl;
+//  std::cout << *Aelms << std::endl;
+//  std::cout << *Aelms << std::endl;
+//
+//  Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
+//                                  Eigen::RowMajor>> Amat{Aelms,
+//                                  states, states};
+//  Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
+//                                  Eigen::RowMajor>> Bmat{Belms,
+//                                  states, inputs};
+//  Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
+//                                  Eigen::RowMajor>> Qmat{Qelms,
+//                                  states, states};
+//  Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
+//                                  Eigen::RowMajor>> Rmat{Relms,
+//                                  inputs, inputs};
+//
+//  std::cout << "a;lkdjfs;a\n" << Amat << std::endl;
+//  std::cout << Bmat << std::endl;
+//  std::cout << Qmat << std::endl;
+//  std::cout << Rmat << std::endl;
+//
+//  Eigen::MatrixXd result =
+//      drake::math::DiscreteAlgebraicRiccatiEquation(Amat, Bmat, Qmat, Rmat);
+//
+//  std::cout << result << std::endl;
+//
+//  env->SetDoubleArrayRegion(S, 0, states * states, result.data());
+//
+//  if (isCopyA == JNI_TRUE) {
+//      env -> ReleaseDoubleArrayElements(A, Aelms, JNI_ABORT);
+//  }
+//  if (isCopyB == JNI_TRUE) {
+//      env -> ReleaseDoubleArrayElements(B, Belms, JNI_ABORT);
+//  }
+//  if (isCopyQ == JNI_TRUE) {
+//      env -> ReleaseDoubleArrayElements(Q, Qelms, JNI_ABORT);
+//  }
+//  if (isCopyR == JNI_TRUE) {
+//      env -> ReleaseDoubleArrayElements(R, Relms, JNI_ABORT);
+//  }
 
 }
 
@@ -99,21 +125,26 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_math_DrakeJNI_exp
   (JNIEnv* env, jclass, jdoubleArray src, jint rows, jdoubleArray dst)
 {
-
-  jboolean isCopy;
-
-  jdouble* Aelms = env->GetDoubleArrayElements(src, &isCopy);
-
   Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
-                                  Eigen::RowMajor>> Amat{Aelms,
-                                  rows, rows};
-
+                                   Eigen::RowMajor>> Amat{env->GetDoubleArrayElements(src, nullptr),
+                                   rows, rows};
   Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> Aexp = Amat.exp();
   env->SetDoubleArrayRegion(dst, 0, rows * rows, Aexp.data());
 
-  if (isCopy == JNI_TRUE) {
-      env -> ReleaseDoubleArrayElements(src, Aelms, JNI_ABORT);
-  }
+//  jboolean isCopy;
+//
+//  jdouble* Aelms = env->GetDoubleArrayElements(src, &isCopy);
+//
+//  Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
+//                                  Eigen::RowMajor>> Amat{Aelms,
+//                                  rows, rows};
+//
+//  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> Aexp = Amat.exp();
+//  env->SetDoubleArrayRegion(dst, 0, rows * rows, Aexp.data());
+//
+//  if (isCopy == JNI_TRUE) {
+//      env -> ReleaseDoubleArrayElements(src, Aelms, JNI_ABORT);
+//  }
 }
 
 
