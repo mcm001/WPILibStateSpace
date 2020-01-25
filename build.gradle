@@ -110,7 +110,7 @@ model {
         }
       }
 
-      nativeUtils.useRequiredLibrary(it, "driver_shared")
+      nativeUtils.useRequiredLibrary(it, "wpilib_executable_shared")
     }
 
     // By default, a development executable will be generated. This is to help the case of
@@ -135,7 +135,7 @@ model {
         lib library: 'WPILibStateSpace', linkage: 'shared'
         lib library: 'WPILibStateSpaceDriver', linkage: 'shared'
 
-        nativeUtils.useRequiredLibrary(it, "driver_shared")
+        nativeUtils.useRequiredLibrary(it, "wpilib_executable_shared")
       }
     }
   }
