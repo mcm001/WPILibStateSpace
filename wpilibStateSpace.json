@@ -2,7 +2,7 @@
     "fileName": "wpilibStateSpace.json",
     "name": "wpilibStateSpace",
     "version": "    020.2.1",
-    "uuid": "libcufrc-e6e8-4db6-89f0-copperforge0", 
+    "uuid": "wpilibStateSpace-9c5edab5-e8a6-49ce-998e-4163600da8bd ",
     "mavenUrls": [
         "https://morley3dprinting.com/dev/files/maven"
     ],
@@ -25,7 +25,7 @@
             "groupId": "edu.wpi.first.wpilibStateSpace",
             "artifactId": "wpilibStateSpace-driver",
             "version": "2020.2.1",
-            "libName": "CuDriver",
+            "libName": "WPILibStateSpaceDriver",
             "headerClassifier": "headers",
             "sharedLibrary": true,
             "skipInvalidPlatforms": true,

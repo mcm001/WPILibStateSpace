@@ -40,8 +40,8 @@ ext.addTaskToCopyAllOutputs = { task ->
     copyAllOutputs.from task.archivePath
 }
 
-def artifactGroupId = 'edu.wpi.first'
-def baseArtifactId = 'wpilibj'
+def artifactGroupId = 'edu.wpi.first.wpilibStateSpace'
+def baseArtifactId = 'WPILibStateSpace'
 def driverZipBaseName = "_GROUP_edu_wpi_first_wpilibj_ID_${baseArtifactId}-driver_CLS"
 def zipBaseName = "_GROUP_edu_wpi_first_wpilibj_ID_${baseArtifactId}-cpp_CLS"
 def javaBaseName = "_GROUP_edu_wpi_first_wpilibj_ID_${baseArtifactId}-java_CLS"
@@ -162,9 +162,9 @@ tasks.matching {it != cleanReleaseRepo}.all {it.dependsOn cleanReleaseRepo}
 
 model {
     publishing {
-        def taskList = createComponentZipTasks($.components, ['Cu'], zipBaseName, Zip, project, includeStandardZipFormat)
+        def taskList = createComponentZipTasks($.components, ['WPILibStateSpace'], zipBaseName, Zip, project, includeStandardZipFormat)
 
-        def driverTaskList = createComponentZipTasks($.components, ['CuDriver'], driverZipBaseName, Zip, project, includeStandardZipFormat)
+        def driverTaskList = createComponentZipTasks($.components, ['WPILibStateSpaceDriver'], driverZipBaseName, Zip, project, includeStandardZipFormat)
 
         publications {
             cpp(MavenPublication) {
