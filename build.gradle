@@ -116,7 +116,7 @@ model {
         }
       }
 
-      nativeUtils.useRequiredLibrary(it, "wpilib_executable_shared")
+      nativeUtils.useRequiredLibrary(it, "driver_shared")
     }
 
     // By default, a development executable will be generated. This is to help the case of
