@@ -99,8 +99,8 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num,
         var S = Drake.discreteAlgebraicRiccatiEquation(discA, discB, Q.getStorage(), R.getStorage());
         m_K = new Matrix<>((discB.transpose().mult(S).mult(discB).plus(R.getStorage())).invert().mult(discB.transpose()).mult(S).mult(discA)); // TODO (HIGH) SWITCH ALGORITHMS
 
-        this.m_r = new MatBuilder<>(states, Nat.N1()).fill(0.0, 0.0);
-        this.m_u = new MatBuilder<>(inputs, Nat.N1()).fill(0.0);
+        this.m_r = new Matrix<>(new SimpleMatrix(states.getNum(), 1));
+        this.m_u = new Matrix<>(new SimpleMatrix(inputs.getNum(), 1));
     }
 
     /**
