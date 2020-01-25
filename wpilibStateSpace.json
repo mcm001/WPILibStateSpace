@@ -4,7 +4,7 @@
     "version": "    020.2.1",
     "uuid": "wpilibStateSpace-9c5edab5-e8a6-49ce-998e-4163600da8bd ",
     "mavenUrls": [
-        "https://morley3dprinting.com/dev/files/maven"
+        "/Users/matthewmorley/.m2/repository/"
     ],
     "jsonUrl": "https://morley3dprinting.com/dev/files/vendordeps/wpilibStateSpace-latest.json",
     "cppDependencies": [

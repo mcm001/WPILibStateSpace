@@ -15,5 +15,4 @@ public class DrakeJNITest {
       Assert.fail();
     }
   }
-
 }

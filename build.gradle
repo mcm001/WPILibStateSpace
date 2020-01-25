@@ -9,6 +9,12 @@ plugins {
   id 'edu.wpi.first.GradleVsCode' version '0.12.0'
 }
 
+java {
+  sourceCompatibility = JavaVersion.VERSION_11
+  targetCompatibility = JavaVersion.VERSION_11
+}
+
+
 def nativeName = "wpilibStateSpace"
 
 ext {
