@@ -9,11 +9,8 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
-variables:
-- group: Artifactory-Package-Publish
-
 jobs:
-- job: Publish
+- job: Buildandpublish
   steps:
   - task: Gradle@2
     inputs:
@@ -33,10 +30,10 @@ jobs:
       workingDirectory: ''
       gradleWrapperFile: 'gradlew'
       gradleOptions: '-Xmx3072m'
-      tasks: 'publish '
-      options: ''
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-    env:
-      RUN_AZURE_ARTIFACTORY_RELEASE: 'TRUE'
-      ARTIFACTORY_PUBLISH_USERNAME: $(PublishUserName)
-      ARTIFACTORY_PUBLISH_PASSWORD: $(PublishPassword)
+      javaHomeOption: 'JDKVersion'
+      jdkVersionOption: '1.11'
+      jdkArchitectureOption: 'x64'
+      publishJUnitResults: true
+      testResultsFiles: '**/TEST-*.xml'
+      tasks: 'publish'
+      options: '-x check'
