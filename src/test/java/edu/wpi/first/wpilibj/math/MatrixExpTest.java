@@ -14,7 +14,7 @@ public class MatrixExpTest {
     public void testMatrixExp() {
 
         Matrix<N2, N2> mat = new MatBuilder<>(Nat.N2(), Nat.N2()).fill(1.2, 5.6, 3.0, 4.0);
-        var exped = Drake.exp(mat);
+        var exped = StateSpaceUtils.exp(mat);
 
         Assert.assertEquals(346.557, exped.get(0, 0), 0.1);
         Assert.assertEquals(661.735, exped.get(0, 1), 0.1);

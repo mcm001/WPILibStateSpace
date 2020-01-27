@@ -74,12 +74,17 @@ public class KalmanFilter<States extends Num, Inputs extends Num,
         var discA = pair.getFirst();
         var discQ = pair.getSecond();
 
-        var discR = StateSpaceUtils.discretizeR(m_contR, dtSeconds);
+        m_discR = StateSpaceUtils.discretizeR(m_contR, dtSeconds);
 
-        m_P = new Matrix<>(Drake.discreteAlgebraicRiccatiEquation(discA.transpose(), plant.getC().transpose(), discQ, discR));
+        m_P = new Matrix<>(Drake.discreteAlgebraicRiccatiEquation(discA.transpose(), plant.getC().transpose(), discQ, m_discR));
 
-        // FIXME NPE here
-        predict(new Matrix<>(new SimpleMatrix(inputs.getNum(), 1)), 0.0);
+        if (StateSpaceUtils.isStabilizable(discA.transpose(),
+            plant.getC().transpose())) {
+            m_P = new Matrix<>(Drake.discreteAlgebraicRiccatiEquation(
+                discA.transpose(), plant.getC().transpose(), discQ, m_discR));
+        } else {
+            m_P = new Matrix<>(new SimpleMatrix(states.getNum(), states.getNum()));
+        }
 
     }
 

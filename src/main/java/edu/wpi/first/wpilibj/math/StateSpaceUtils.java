@@ -66,7 +66,7 @@ public class StateSpaceUtils {
      * @return the discrete matrix system.
      */
     public static <States extends Num> Matrix<States, States> discretizeA(Matrix<States, States> contA, double dtSeconds) {
-        return Drake.exp((contA.times(dtSeconds)));
+        return exp((contA.times(dtSeconds)));
     }
 
     /**
@@ -330,6 +330,37 @@ public class StateSpaceUtils {
 
         return F;
 
+    }
+
+    public static <N extends Num> Matrix<N, N> exp(
+        Matrix<N, N> A
+    ) {
+        Matrix<N, N> toReturn  = new Matrix<>(new SimpleMatrix(A.getNumRows(), A.getNumCols()));
+        StateSpaceUtilsJNI.exp(A.getStorage().getDDRM().getData(), A.getNumRows(), toReturn.getStorage().getDDRM().getData());
+        return toReturn;
+    }
+
+    public static SimpleMatrix exp(
+            SimpleMatrix A
+    ) {
+        SimpleMatrix toReturn  = new SimpleMatrix(A.numRows(), A.numRows());
+        StateSpaceUtilsJNI.exp(A.getDDRM().getData(), A.numRows(), toReturn.getDDRM().getData());
+        return toReturn;
+    }
+
+    public static <S extends Num, I extends Num> boolean isStabilizable(
+        Matrix<S, S> A, Matrix<S, I> B
+    ) {
+        return StateSpaceUtilsJNI.isStabilizable(A.getNumRows(), B.getNumCols(),
+            A.getStorage().getDDRM().getData(), B.getStorage().getDDRM().getData());
+    }
+
+    public static SimpleMatrix isStabilizable(
+        SimpleMatrix A
+    ) {
+        SimpleMatrix toReturn  = new SimpleMatrix(A.numRows(), A.numRows());
+        StateSpaceUtilsJNI.exp(A.getDDRM().getData(), A.numRows(), toReturn.getDDRM().getData());
+        return toReturn;
     }
 
 }

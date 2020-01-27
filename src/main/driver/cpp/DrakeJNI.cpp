@@ -116,36 +116,4 @@ Java_edu_wpi_first_wpilibj_math_DrakeJNI_discreteAlgebraicRiccatiEquation
 
 }
 
-/*
- * Class:     edu_wpi_first_wpilibj_math_DrakeJNI
- * Method:    exp
- * Signature: ([DI[D)V
- */
-JNIEXPORT void JNICALL
-Java_edu_wpi_first_wpilibj_math_DrakeJNI_exp
-  (JNIEnv* env, jclass, jdoubleArray src, jint rows, jdoubleArray dst)
-{
-  Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
-                                   Eigen::RowMajor>> Amat{env->GetDoubleArrayElements(src, nullptr),
-                                   rows, rows};
-  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> Aexp = Amat.exp();
-  env->SetDoubleArrayRegion(dst, 0, rows * rows, Aexp.data());
-
-//  jboolean isCopy;
-//
-//  jdouble* Aelms = env->GetDoubleArrayElements(src, &isCopy);
-//
-//  Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
-//                                  Eigen::RowMajor>> Amat{Aelms,
-//                                  rows, rows};
-//
-//  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> Aexp = Amat.exp();
-//  env->SetDoubleArrayRegion(dst, 0, rows * rows, Aexp.data());
-//
-//  if (isCopy == JNI_TRUE) {
-//      env -> ReleaseDoubleArrayElements(src, Aelms, JNI_ABORT);
-//  }
-}
-
-
 }  // extern "C"

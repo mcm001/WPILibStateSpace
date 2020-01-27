@@ -85,7 +85,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num,
         Mcont = Mcont.concatRows(new SimpleMatrix(inputs.getNum(), size));
 
         // calculate discrete A and B matrices
-        SimpleMatrix Mstate = Drake.exp(Mcont);
+        SimpleMatrix Mstate = StateSpaceUtils.exp(Mcont);
 
         var discA = new SimpleMatrix(states.getNum(), states.getNum());
         var discB = new SimpleMatrix(states.getNum(), inputs.getNum());
