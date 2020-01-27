@@ -59,7 +59,7 @@ Java_edu_wpi_first_wpilibj_math_StateSpaceUtilsJNI_isStabilizable
                                 Eigen::RowMajor>> Bmat{env->GetDoubleArrayElements(bSrc, nullptr),
                                 states, inputs};
 
-    return frc::IsStabilizable<states, inputs>(Amat, Bmat);
+    return frc::IsStabilizable<>(Amat, Bmat);
  }
 
 }
