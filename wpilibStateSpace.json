@@ -33,7 +33,7 @@
             "binaryPlatforms": [
                 "windowsx86-64",
                 "linuxathena",
-                "osxx86-64""
+                "osxx86-64"
             ]
         }
     ],
@@ -54,7 +54,7 @@
             "validPlatforms": [
                 "windowsx86-64",
                 "linuxathena",
-                "osxx86-64""
+                "osxx86-64"
             ]
         }
     ]
