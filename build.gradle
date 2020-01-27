@@ -1,5 +1,15 @@
 import edu.wpi.first.toolchain.*
 
+buildscript {
+  repositories {
+    jcenter()
+  }
+  dependencies {
+    //Check for the latest version here: http://plugins.gradle.org/plugin/com.jfrog.artifactory
+    classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4+"
+  }
+}
+
 plugins {
   id 'cpp'
   id 'java'
@@ -7,6 +17,11 @@ plugins {
   id 'edu.wpi.first.NativeUtils' version  '2020.7.2' //'2019.5.15' //'2020.1.0'
   id 'edu.wpi.first.GradleJni' version '0.10.1'
   id 'edu.wpi.first.GradleVsCode' version '0.12.0'
+}
+
+
+allprojects {
+  apply plugin: "com.jfrog.artifactory"
 }
 
 java {

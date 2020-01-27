@@ -201,3 +201,21 @@ model {
         }
     }
 }
+
+artifactory {
+    contextUrl = 'https://maven.meshnet0.com/artifactory'
+    publish {
+        repository {
+            if(project.hasProperty('releaseRepoPublish')) {
+                repoKey = 'release'
+            } else {
+                repoKey = 'gradle-dev-local'
+            }
+            username = System.getenv()['ARTIFACTORY_PUBLISH_USERNAME']
+            password = System.getenv()['ARTIFACTORY_PUBLISH_PASSWORD']
+            maven = true
+        }
+    }
+    clientConfig.info.setBuildName('thirdparty')
+}
+publish.dependsOn artifactoryPublish
