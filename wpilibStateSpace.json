@@ -18,7 +18,8 @@
             "skipInvalidPlatforms": true,
             "binaryPlatforms": [
                 "windowsx86-64",
-                "linuxathena"
+                "linuxathena",
+                "osxx86-64"
             ]
         },
         {
@@ -31,7 +32,8 @@
             "skipInvalidPlatforms": true,
             "binaryPlatforms": [
                 "windowsx86-64",
-                "linuxathena"
+                "linuxathena",
+                "osxx86-64""
             ]
         }
     ],
@@ -51,7 +53,8 @@
             "skipInvalidPlatforms": true,
             "validPlatforms": [
                 "windowsx86-64",
-                "linuxathena"
+                "linuxathena",
+                "osxx86-64""
             ]
         }
     ]
