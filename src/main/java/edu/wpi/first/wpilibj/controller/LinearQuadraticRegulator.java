@@ -29,6 +29,10 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num,
     // Controller gain.
     private Matrix<Inputs, States> m_K;
 
+    // disc b
+    private Matrix<States, Inputs> m_discB;
+    private Matrix<States, States> m_discA;
+
     public Matrix<Inputs, N1> getU() {
         return m_u;
     }
@@ -96,11 +100,20 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num,
         var Q = StateSpaceUtils.makeCostMatrix(states, qElems);
         var R = StateSpaceUtils.makeCostMatrix(inputs, rElems);
 
+        this.m_discB = new Matrix<>(discB);
+        this.m_discA = new Matrix<>(discA);
+
         var S = Drake.discreteAlgebraicRiccatiEquation(discA, discB, Q.getStorage(), R.getStorage());
-        m_K = new Matrix<>((discB.transpose().mult(S).mult(discB).plus(R.getStorage())).invert().mult(discB.transpose()).mult(S).mult(discA)); // TODO (HIGH) SWITCH ALGORITHMS
+        
+        var temp = (m_discB.transpose().getStorage().mult(S).mult(discB)).plus(R.getStorage());
+        m_K = new Matrix<>(
+            StateSpaceUtils.lltDecompose(temp).solve(discB.transpose().mult(S).mult(discA)));
+        
+        // m_K = new Matrix<>((discB.transpose().mult(S).mult(discB).plus(R.getStorage())).invert().mult(discB.transpose()).mult(S).mult(discA)); // TODO (HIGH) SWITCH ALGORITHMS
 
         this.m_r = new Matrix<>(new SimpleMatrix(states.getNum(), 1));
         this.m_u = new Matrix<>(new SimpleMatrix(inputs.getNum(), 1));
+        
     }
 
     /**
@@ -144,7 +157,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num,
      */
     public void update(Matrix<States, N1> x) {
         if(m_enabled) {
-            m_u = m_K.times(m_r.minus(x)).plus(new Matrix<>(StateSpaceUtils.householderQrDecompose(m_B.getStorage()).solve((m_r.minus(m_A.times(m_r))).getStorage())));
+            m_u = m_K.times(m_r.minus(x)).plus(new Matrix<>(StateSpaceUtils.householderQrDecompose(m_discB.getStorage()).solve((m_r.minus(m_discA.times(m_r))).getStorage())));
         }
     }
 
@@ -158,7 +171,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num,
         if(m_enabled) {
             Matrix<States, N1> error = m_r.minus(x);
             Matrix<Inputs, N1> feedBack = m_K.times(error);
-            Matrix<Inputs, N1> feedForward = new Matrix<>(StateSpaceUtils.householderQrDecompose(m_B.getStorage()).solve((nextR.minus(m_A.times(m_r))).getStorage()));
+            Matrix<Inputs, N1> feedForward = new Matrix<>(StateSpaceUtils.householderQrDecompose(m_discB.getStorage()).solve((nextR.minus(m_discA.times(m_r))).getStorage()));
 
             m_u = feedBack.plus(feedForward);
             m_r = nextR;

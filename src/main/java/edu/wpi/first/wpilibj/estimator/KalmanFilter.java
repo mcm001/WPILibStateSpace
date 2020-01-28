@@ -146,13 +146,6 @@ public class KalmanFilter<States extends Num, Inputs extends Num,
     public void predict(Matrix<Inputs, N1> u, double dtSeconds) {
         m_plant.setX(m_plant.calculateX(m_plant.getX(), u, dtSeconds));
 
-//        m_discQ = StateSpaceUtils.discretizeProcessNoiseCov(states, m_plant.getA(), m_contQ, dtSeconds);
-//        m_discR = StateSpaceUtils.discretizeMeasurementNoiseCov(m_contR, dtSeconds);
-//        m_P = m_plant.getA().times(m_P).times(m_plant.getA().transpose()).plus(m_discQ);
-
-//        Matrix<States, States> discA = new Matrix<>(new SimpleMatrix(states.getNum(), states.getNum()));
-//        Matrix<States, States> discQ = new Matrix<>(new SimpleMatrix(states.getNum(), states.getNum()));
-
         var pair = StateSpaceUtils.discretizeAQTaylor(m_plant.getA(), m_contQ, dtSeconds);
         var discA = pair.getFirst();
         var discQ = pair.getSecond();
