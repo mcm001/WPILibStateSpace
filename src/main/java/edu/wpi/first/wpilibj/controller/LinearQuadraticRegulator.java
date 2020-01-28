@@ -105,11 +105,11 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num,
 
         var S = Drake.discreteAlgebraicRiccatiEquation(discA, discB, Q.getStorage(), R.getStorage());
         
-        var temp = (m_discB.transpose().getStorage().mult(S).mult(discB)).plus(R.getStorage());
-        m_K = new Matrix<>(
-            StateSpaceUtils.lltDecompose(temp).solve(discB.transpose().mult(S).mult(discA)));
+//        var temp = (m_discB.transpose().getStorage().mult(S).mult(discB)).plus(R.getStorage());
+//        m_K = new Matrix<>(
+//            StateSpaceUtils.lltDecompose(temp).solve(discB.transpose().mult(S).mult(discA)));
         
-        // m_K = new Matrix<>((discB.transpose().mult(S).mult(discB).plus(R.getStorage())).invert().mult(discB.transpose()).mult(S).mult(discA)); // TODO (HIGH) SWITCH ALGORITHMS
+         m_K = new Matrix<>((discB.transpose().mult(S).mult(discB).plus(R.getStorage())).invert().mult(discB.transpose()).mult(S).mult(discA)); // TODO (HIGH) SWITCH ALGORITHMS
 
         this.m_r = new Matrix<>(new SimpleMatrix(states.getNum(), 1));
         this.m_u = new Matrix<>(new SimpleMatrix(inputs.getNum(), 1));

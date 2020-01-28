@@ -49,17 +49,17 @@ Java_edu_wpi_first_wpilibj_math_StateSpaceUtilsJNI_exp
 
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_wpilibj_math_StateSpaceUtilsJNI_isStabilizable
- (JNIEnv* env, jclass, const jint states, const jint inputs, jdoubleArray aSrc, jdoubleArray bSrc) {
+ (JNIEnv* env, jclass, jint states, jint inputs, jdoubleArray aSrc, jdoubleArray bSrc) {
 
-    Eigen::Map<Eigen::Matrix<double, states, states,
+    Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
                                 Eigen::RowMajor>> Amat{env->GetDoubleArrayElements(aSrc, nullptr),
                                 states, states};
 
-    Eigen::Map<Eigen::Matrix<double, states, inputs,
+    Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
                                 Eigen::RowMajor>> Bmat{env->GetDoubleArrayElements(bSrc, nullptr),
                                 states, inputs};
 
     return true;// frc::IsStabilizable<>(Amat, Bmat);
  }
 
-}
+}  // extern "C"

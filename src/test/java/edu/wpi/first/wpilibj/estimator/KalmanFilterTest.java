@@ -102,11 +102,12 @@ public class KalmanFilterTest {
         var robotPose = trajectory.getInitialPose();
         var lastControlInput = new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.0, 0.0, 0.0);
         var isDone = false;
-        var lastTime = 0;
+        var lastTime = 0.0;
         System.out.println("refX, refY, x, y");
         while(!isDone) {
             var state = trajectory.sample(lastTime);
             lastTime += 0.020;
+            isDone = (lastTime > trajectory.getTotalTimeSeconds());
 
             var robotPoseWithNoise = robotPose.plus(new Transform2d(
                 new Translation2d(

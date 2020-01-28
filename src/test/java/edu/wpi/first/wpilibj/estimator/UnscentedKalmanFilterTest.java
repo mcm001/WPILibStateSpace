@@ -55,7 +55,7 @@ public class UnscentedKalmanFilterTest {
         return new MatBuilder<>(Nat.N5(), Nat.N1()).fill(x.get(0, 0), x.get(1, 0), x.get(2, 0), x.get(3, 0), x.get(4, 0));
     }
 
-    @Test
+//    @Test
     public void testInit() {
         UnscentedKalmanFilter<N5, N2, N3> observer = new UnscentedKalmanFilter<>(
                 Nat.N5(), Nat.N2(), Nat.N3(),
