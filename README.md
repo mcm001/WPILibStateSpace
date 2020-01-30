@@ -14,4 +14,4 @@ As of right now this project is very much still in development. We are working o
 ## Compiling
 
 * Use a Unix (Non-Windows) machine with GCC and Java 11 (or higher) installed
-* Clone this repository and run `./gradlew build publishToMavenLocal`. Optionally use the `--max-workers n`, where n is the number of threads to spawn. Note that each thread consumes up to 3GB of RAM.
+* Clone this repository and run `./gradlew build publishToMavenLocal`. Optionally use the `--max-workers n` flag, where n is the number of threads to spawn, to prevent your computer from deadlocking as each thread consumes up to 3GB of RAM.
