@@ -75,6 +75,7 @@ dependencies {
   implementation "com.fasterxml.jackson.core:jackson-databind:2.10.0"
 
   testImplementation('junit:junit:4.13')
+  testCompile "org.knowm.xchart:xchart:3.2.2"
 }
 
 // Set up exports properly

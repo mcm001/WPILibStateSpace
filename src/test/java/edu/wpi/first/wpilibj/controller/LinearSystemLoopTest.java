@@ -11,7 +11,12 @@ import edu.wpi.first.wpiutil.math.numbers.N2;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.Assert;
 import org.junit.Test;
+import org.knowm.xchart.SwingWrapper;
+import org.knowm.xchart.XYChart;
+import org.knowm.xchart.XYChartBuilder;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
@@ -43,9 +48,18 @@ public class LinearSystemLoopTest {
         m_loop = new LinearSystemLoop<>(Nat.N2(), Nat.N1(), Nat.N1(), plant, controller, observer);
     }
 
-    private static void update(LinearSystemLoop<N2, N1, N1> loop, double noise) {
+    private static void updateTwoState(LinearSystemLoop<N2, N1, N1> loop, double noise) {
         Matrix<N1, N1> y = loop.getPlant().calculateY(loop.getXHat(), loop.getU()).plus(
                 new MatBuilder<>(Nat.N1(), Nat.N1()).fill(noise)
+        );
+
+        loop.correct(y);
+        loop.predict(kDt);
+    }
+
+    private static void updateOneState(LinearSystemLoop<N1, N1, N1> loop, double noise) {
+        Matrix<N1, N1> y = loop.getPlant().calculateY(loop.getXHat(), loop.getU()).plus(
+            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(noise)
         );
 
         loop.correct(y);
@@ -71,7 +85,7 @@ public class LinearSystemLoopTest {
             var state = profile.calculate(kDt);
             m_loop.setNextR(new MatBuilder<>(Nat.N2(), Nat.N1()).fill(state.position, state.velocity));
 
-            update(m_loop, (random.nextDouble() - 0.5) * kPositionStddev);
+            updateTwoState(m_loop, (random.nextGaussian()) * kPositionStddev);
             var u = m_loop.getU(0);
 
             assertTrue(u >= -12 && u <= 12.0);
@@ -80,6 +94,74 @@ public class LinearSystemLoopTest {
         assertEquals(2.0, m_loop.getXHat(0), 0.05);
         assertEquals(0.0, m_loop.getXHat(1), 0.5);
 
+    }
+
+    @Test
+    public void testFlywheelEnabled() {
+
+        LinearSystem<N1, N1, N1> plant = LinearSystem.createFlywheelSystem(DCMotor.getNEO(2),
+            0.01, 1.0, 12.0);
+        KalmanFilter<N1, N1, N1> observer = new KalmanFilter<>(Nat.N1(), Nat.N1(), Nat.N1(), plant,
+            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(1.0),
+            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(0.01), kDt);
+
+        var qElms = new MatBuilder<>(Nat.N1(), Nat.N1()).fill(9.0);
+        var rElms = new MatBuilder<>(Nat.N1(), Nat.N1()).fill(12.0);
+
+        var controller = new LinearQuadraticRegulator<>(
+            Nat.N1(), Nat.N1(),
+            plant, qElms, rElms, kDt);
+
+        var loop = new LinearSystemLoop<>(Nat.N1(), Nat.N1(), Nat.N1(), plant, controller, observer);
+
+        loop.reset();
+        loop.enable();
+        var references = new MatBuilder<>(Nat.N1(), Nat.N1()).fill(3000 / 60d * 2 * Math.PI);
+
+        loop.setNextR(references);
+
+        List<Double> timeData = new ArrayList<>();
+        List<Double> xHat = new ArrayList<>();
+        List<Double> volt = new ArrayList<>();
+        List<Double> reference = new ArrayList<>();
+        List<Double> error = new ArrayList<>();
+
+        var time = 0.0;
+        for(int i = 0; i < 10000; i++) {
+
+            // trapezoidal profile gang
+            loop.setNextR(references);
+
+            updateOneState(loop, (random.nextGaussian()) * kPositionStddev);
+            var u = loop.getU(0);
+
+            assertTrue(u >= -12 && u <= 12.0);
+
+            xHat.add(loop.getXHat(0) / 2d / Math.PI * 60);
+            volt.add(u);
+            time += 0.020;
+            timeData.add(time);
+            reference.add(references.get(0, 0) / 2d / Math.PI * 60);
+            error.add(loop.getError(0) / 2d / Math.PI * 60);
+        }
+
+        XYChart bigChart = new XYChartBuilder().build();
+        bigChart.addSeries("Xhat, RPM", timeData, xHat);
+        bigChart.addSeries("Reference, RPM", timeData, reference);
+        bigChart.addSeries("Error, RPM", timeData, error);
+
+        XYChart smolChart = new XYChartBuilder().build();
+        smolChart.addSeries("Vots, V", timeData, volt);
+
+        try {
+            new SwingWrapper<>(bigChart).displayChart();
+            new SwingWrapper<>(smolChart).displayChart();
+            Thread.sleep(10000000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        assertEquals(references.get(0, 0), loop.getXHat(0), 5.0);
     }
 
     @Test
@@ -92,7 +174,7 @@ public class LinearSystemLoopTest {
         Assert.assertEquals(0.0, m_loop.getXHat(1), 1e-6);
 
         for (int i = 0; i < 100; i++) {
-            update(m_loop, 0.0);
+            updateTwoState(m_loop, 0.0);
         }
 
         Assert.assertEquals(0.0, m_loop.getXHat(0), 1e-6);

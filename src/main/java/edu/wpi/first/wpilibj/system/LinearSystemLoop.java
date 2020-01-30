@@ -172,6 +172,13 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
     }
 
     /**
+     * Returns difference between reference r and x-hat.
+     */
+    public double getError(int index) {
+        return (m_controller.getR().minus(m_observer.getXhat())).get(index, 0);
+    }
+
+    /**
      * Correct the state estimate x-hat using the measurements in y.
      *
      * @param y Measurement vector.

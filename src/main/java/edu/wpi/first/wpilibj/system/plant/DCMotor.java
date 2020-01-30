@@ -43,5 +43,8 @@ public class DCMotor {
     }
 
 
-
+  public static DCMotor getNEO(int numMotors) {
+        return new DCMotor(12, 2.6 * numMotors,
+            105, 1.8, 5676 / 60d * 2 * Math.PI);
+  }
 }

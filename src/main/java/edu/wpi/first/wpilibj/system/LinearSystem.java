@@ -460,6 +460,6 @@ public class LinearSystem<States extends Num, Inputs extends Num,
 
     @Override
     public String toString() {
-        return String.format("Linear System: A\n%s\n\nB:\n%s\n\nC:\n%s\n\nD:\n%s\n", m_A, m_B, m_C, m_D);
+        return String.format("Linear System: A\n%s\n\nB:\n%s\n\nC:\n%s\n\nD:\n%s\n", m_A.getStorage(), m_B.getStorage(), m_C.getStorage(), m_D.getStorage());
     }
 }
