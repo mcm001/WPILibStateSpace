@@ -64,7 +64,7 @@ class LinearQuadraticRegulator {
       : m_A(A), m_B(B) {
     Eigen::Matrix<double, States, States> discA;
     Eigen::Matrix<double, States, Inputs> discB;
-    DiscretizeAB(m_A, m_B, dt, &discA, &discB);
+    DiscretizeAB<States, Inputs>(m_A, m_B, dt, &discA, &discB);
 
     Eigen::Matrix<double, States, States> Q = MakeCostMatrix(Qelems);
     Eigen::Matrix<double, Inputs, Inputs> R = MakeCostMatrix(Relems);
