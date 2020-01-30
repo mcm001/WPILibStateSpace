@@ -206,95 +206,24 @@ model {
     }
 }
 
-//if (System.getenv()['RUN_AZURE_ARTIFACTORY_RELEASE'] != null) {
-    artifactory {
-        contextUrl = 'https://maven.meshnet0.com/artifactory'
-        publish {
-            repository {
-                if(project.hasProperty('releaseRepoPublish')) {
-                    repoKey = 'release'
-                } else {
-                    repoKey = 'gradle-dev'
-                }
-                username = "admin"
-                password = System.getenv()['ARTIFACTORY_PUBLISH_PASSWORD']
-                maven = true
-            }
+artifactory {
+    contextUrl = "https://maven.meshnet0.com/artifactory" //"${artifactory_contextUrl}"   //The base Artifactory URL if not overridden by the publisher/resolver
+    publish {
+        repository {
+            repoKey = 'gradle-dev-local'
+            username = "admin"
+            password = "-----"
+            maven = true
+
         }
-        clientConfig.info.setBuildName('thirdparty')
     }
-    publish.dependsOn artifactoryPublish
-//}
+    resolve {
+        repository {
+            repoKey = 'gradle-dev'
+            username = "admin"
+            password = "-----"
+            maven = true
 
-def fileFinder = new FileNameFinder()
-
-def zipFiles = files(fileFinder.getFileNames(new File(projectDir, 'build/repos/').absolutePath, '**/allOutputs/*.zip'))
-def jarFiles = files(fileFinder.getFileNames(new File(projectDir, 'build/repos/').absolutePath, '**/allOutputs/*.jar'))
-def allFiles = zipFiles + jarFiles
-
-String regex = "([_M_]*)_GROUP_([^\\.]+)_ID_([^\\.]+)_CLS([^\\.]*)."
-Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
-
-def groups = [:]
-
-for (File it : allFiles) {
-
-    Matcher matcher = pattern.matcher(it.name);
-
-
-    if (!matcher.find()) {
-        continue
-    }
-
-    def generateAll = matcher.group(1) == '_M_'
-
-    def groupId = matcher.group(2)
-    def artifactId = matcher.group(3)
-    def classifier = matcher.group(4)
-
-    if (!classifier.empty) {
-        classifier = classifier.substring(1)
-    }
-
-    def group = groups[groupId]
-    if (group == null) {
-        group = [:]
-        groups[groupId] = group
-    }
-
-
-    def id = group[artifactId]
-    if (id == null) {
-        id = []
-        group[artifactId] = id
-    }
-
-    id << new Tuple(classifier, generateAll, it)
-
-}
-
-publishing {
-    publications {
-        groups.each { key, value->
-            value.each { key2, value2->
-                "${key}${key2}"(MavenPublication) {
-                    value2.each { t->
-                        artifact (t.get(2)) {
-                            if (!t.get(0).empty) {
-                                classifier = t.get(0)
-                            }
-                        }
-                    }
-                    groupId = key.replace('_', '.')
-                    artifactId = key2
-                    version = pubVersion
-                }
-//                if (System.getenv()['RUN_AZURE_ARTIFACTORY_RELEASE'] != null) {
-                    project.artifactoryPublish {
-                        publications("${key}${key2}")
-                    }
-//                }
-            }
         }
     }
 }
