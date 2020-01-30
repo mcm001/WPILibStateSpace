@@ -426,7 +426,7 @@ public class LinearSystem<States extends Num, Inputs extends Num,
         uMax.set(0, 0, maxVoltage);
         var uMin = uMax.times(-1);
 
-        return new LinearSystem<>(Nat.N1(), Nat.N1(), Nat.N1(), A, B, C, D, uMax, uMax);
+        return new LinearSystem<>(Nat.N1(), Nat.N1(), Nat.N1(), A, B, C, D, uMin, uMax);
     }
 
     public static LinearSystem<N2, N1, N1> createSingleJointedArmSystem(DCMotor motor, double jKgSquaredMeters, double G, double maxVoltage) {

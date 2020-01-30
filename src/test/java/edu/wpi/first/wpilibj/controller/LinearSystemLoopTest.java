@@ -96,11 +96,22 @@ public class LinearSystemLoopTest {
 
     }
 
+    private void outputDebugInfo(LinearSystemLoop loop) {
+//        return String.format("Xhat:\n%s\nRefereence:\n%s\nError:\n%s\nU:\n%s\n",
+//            loop.getXHat().getStorage(), loop.getNextR().getStorage(), loop.getError().getStorage(), loop.getU().getStorage());
+
+        var x = loop.getXHat().getStorage();
+        var r = loop.getNextR().getStorage();
+        var error = loop.getError().getStorage();
+        var u = loop.getU().getStorage();
+        var yes = 4;
+    }
+
     @Test
     public void testFlywheelEnabled() {
 
         LinearSystem<N1, N1, N1> plant = LinearSystem.createFlywheelSystem(DCMotor.getNEO(2),
-            0.01, 1.0, 12.0);
+            0.00289, 1.0, 12.0);
         KalmanFilter<N1, N1, N1> observer = new KalmanFilter<>(Nat.N1(), Nat.N1(), Nat.N1(), plant,
             new MatBuilder<>(Nat.N1(), Nat.N1()).fill(1.0),
             new MatBuilder<>(Nat.N1(), Nat.N1()).fill(0.01), kDt);
@@ -127,9 +138,12 @@ public class LinearSystemLoopTest {
         List<Double> error = new ArrayList<>();
 
         var time = 0.0;
-        for(int i = 0; i < 10000; i++) {
+        while(time < 10 || Math.abs(loop.getError(0)) < 3) {
 
-            // trapezoidal profile gang
+            if(time > 10) {
+                break;
+            }
+
             loop.setNextR(references);
 
             updateOneState(loop, (random.nextGaussian()) * kPositionStddev);
@@ -139,10 +153,12 @@ public class LinearSystemLoopTest {
 
             xHat.add(loop.getXHat(0) / 2d / Math.PI * 60);
             volt.add(u);
-            time += 0.020;
+            time += kDt;
             timeData.add(time);
             reference.add(references.get(0, 0) / 2d / Math.PI * 60);
             error.add(loop.getError(0) / 2d / Math.PI * 60);
+
+            outputDebugInfo(loop);
         }
 
         XYChart bigChart = new XYChartBuilder().build();
@@ -151,7 +167,7 @@ public class LinearSystemLoopTest {
         bigChart.addSeries("Error, RPM", timeData, error);
 
         XYChart smolChart = new XYChartBuilder().build();
-        smolChart.addSeries("Vots, V", timeData, volt);
+        smolChart.addSeries("Volts, V", timeData, volt);
 
         try {
             new SwingWrapper<>(bigChart).displayChart();
