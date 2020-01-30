@@ -96,17 +96,6 @@ public class LinearSystemLoopTest {
 
     }
 
-    private void outputDebugInfo(LinearSystemLoop loop) {
-//        return String.format("Xhat:\n%s\nRefereence:\n%s\nError:\n%s\nU:\n%s\n",
-//            loop.getXHat().getStorage(), loop.getNextR().getStorage(), loop.getError().getStorage(), loop.getU().getStorage());
-
-        var x = loop.getXHat().getStorage();
-        var r = loop.getNextR().getStorage();
-        var error = loop.getError().getStorage();
-        var u = loop.getU().getStorage();
-        var yes = 4;
-    }
-
     @Test
     public void testFlywheelEnabled() {
 
@@ -157,27 +146,25 @@ public class LinearSystemLoopTest {
             timeData.add(time);
             reference.add(references.get(0, 0) / 2d / Math.PI * 60);
             error.add(loop.getError(0) / 2d / Math.PI * 60);
-
-            outputDebugInfo(loop);
         }
 
-        XYChart bigChart = new XYChartBuilder().build();
-        bigChart.addSeries("Xhat, RPM", timeData, xHat);
-        bigChart.addSeries("Reference, RPM", timeData, reference);
-        bigChart.addSeries("Error, RPM", timeData, error);
+//        XYChart bigChart = new XYChartBuilder().build();
+//        bigChart.addSeries("Xhat, RPM", timeData, xHat);
+//        bigChart.addSeries("Reference, RPM", timeData, reference);
+//        bigChart.addSeries("Error, RPM", timeData, error);
+//
+//        XYChart smolChart = new XYChartBuilder().build();
+//        smolChart.addSeries("Volts, V", timeData, volt);
+//
+//        try {
+//            new SwingWrapper<>(bigChart).displayChart();
+//            new SwingWrapper<>(smolChart).displayChart();
+//            Thread.sleep(10000000);
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
-        XYChart smolChart = new XYChartBuilder().build();
-        smolChart.addSeries("Volts, V", timeData, volt);
-
-        try {
-            new SwingWrapper<>(bigChart).displayChart();
-            new SwingWrapper<>(smolChart).displayChart();
-            Thread.sleep(10000000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        assertEquals(references.get(0, 0), loop.getXHat(0), 5.0);
+        assertEquals(loop.getError(0), 0.0, 0.1);
     }
 
     @Test
