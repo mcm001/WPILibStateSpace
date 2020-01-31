@@ -160,7 +160,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
         final var discA = discPair.getFirst();
         final var discQ = discPair.getSecond();
 
-        m_xHat = RungeKuttaHelper.RungeKutta(f, m_xHat, u, dtSeconds);
+        m_xHat = RungeKuttaHelper.rungeKutta(f, m_xHat, u, dtSeconds);
         m_P = discA.times(m_P).times(discA.transpose()).plus(discQ);
         m_discR = StateSpaceUtils.discretizeR(m_contR, dtSeconds);
     }
