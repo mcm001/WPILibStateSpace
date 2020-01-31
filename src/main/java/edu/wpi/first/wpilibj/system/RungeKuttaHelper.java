@@ -40,7 +40,6 @@ public class RungeKuttaHelper {
      * @param x The initial value of x.
      * @param u The value u held constant over the integration period.
      * @param dtSeconds The time over which to integrate.
-     * @return
      */
     public static double RungeKutta(
             BiFunction<Double, Double, Double> f,
