@@ -206,24 +206,69 @@ model {
     }
 }
 
-artifactory {
-    contextUrl = "https://maven.meshnet0.com/artifactory" //"${artifactory_contextUrl}"   //The base Artifactory URL if not overridden by the publisher/resolver
-    publish {
-        repository {
-            repoKey = 'gradle-dev-local'
-            username = "admin"
-            password = "-----"
-            maven = true
-
+def pomConfig = {
+    licenses {
+        license {
+            name "The Apache Software License, Version 2.0"
+            url "http://www.apache.org/licenses/LICENSE-2.0.txt"
+            distribution "repo"
         }
     }
-    resolve {
-        repository {
-            repoKey = 'gradle-dev'
-            username = "admin"
-            password = "-----"
-            maven = true
-
+    developers {
+        developer {
+            id "thombergs"
+            name "Tom Hombergs"
+            email "tom.hombergs@gmail.com"
         }
     }
+
+    scm {
+        url "https://github.com/thombergs/myAwesomeLib"
+    }
+}
+
+publishing {
+    publications {
+        mavenPublication(MavenPublication) {
+
+//            artifacts {
+//                archives sourcesJar
+//                archives javadocJar
+//                archives outputJar
+//                archives outputSourcesJar
+//                archives outputJavadocJar
+//            }
+
+            groupId 'wpilib-state-space'
+            artifactId 'wpilib-state-space'
+            version '2020.0.1'
+            pom.withXml {
+                def root = asNode()
+                root.appendNode('description', 'A vendor dependency for modern control theory in FRC')
+                root.appendNode('name', 'WPILib State Space')
+                root.appendNode('url', 'https://github.com/mcm001/WPILibStateSpace/')
+                root.children().last() + pomConfig
+            }
+        }
+    }
+}
+
+bintray {
+    user = System.getProperty('bintray.user')
+    key = System.getProperty('bintray.key')
+    publications = ['mavenPublication']
+
+    pkg {
+        repo = 'wpilib-state-space'
+        name = 'wpilib-state-space'
+//        userOrg = 'mcm001'
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/mcm001/WPILibStateSpace.git'
+        version {
+            name = '2020.0.1'
+            desc = '2020.0.1'
+            released  = new Date()
+        }
+    }
+
 }
