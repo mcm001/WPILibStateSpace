@@ -6,6 +6,9 @@ import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.Num;
 import edu.wpi.first.wpiutil.math.SimpleMatrixUtils;
 import edu.wpi.first.wpiutil.math.numbers.N1;
+
+import java.util.Random;
+
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.decomposition.qr.QRDecompositionHouseholder_DDRM;
@@ -15,12 +18,44 @@ import org.ejml.simple.SimpleMatrix;
 
 public class StateSpaceUtils {
 
+    /**
+     * Creates a covariance matrix from the given vector for use with Kalman
+     * filters.
+     *
+     * Each element is squared and placed on the covariance matrix diagonal.
+     *
+     * @param stdDevs For a Q matrix, its elements are the standard deviations of
+     *                each state from how the model behaves. For an R matrix, its
+     *                elements are the standard deviations for each output
+     *                measurement.
+     * @return        Process noise or measurement noise covariance matrix.
+     */
     public static <States extends Num> Matrix<States, States> makeCovMatrix(
             Nat<States> states, Matrix<States, N1> stdDevs
     ) {
         var result = new Matrix<States, States>(new SimpleMatrix(states.getNum(), states.getNum()));
         for(int i = 0; i < states.getNum(); i++) {
             result.set(i, i, Math.pow(stdDevs.get(i, 0), 2));
+        }
+        return result;
+    }
+
+    /**
+     * Creates a vector of normally distributed white noise with the given noise
+     * intensities for each element.
+     *
+     * @param stdDevs A matrix whose elements are the standard deviations of each
+     *                element of the noise vector.
+     * @return        White noise vector.
+     */
+    public static <N extends Num> Matrix<N, N1> makeWhiteNoiseVector(
+        Nat<N> n, Matrix<N, N1> stdDevs
+    ) {
+        var rand = new Random();
+
+        Matrix<N, N1> result = new Matrix<>(new SimpleMatrix(n.getNum(), 1));
+        for (int i = 0; i < n.getNum(); i++) {
+            result.set(i, 0, rand.nextGaussian() * stdDevs.get(i, 0));
         }
         return result;
     }
