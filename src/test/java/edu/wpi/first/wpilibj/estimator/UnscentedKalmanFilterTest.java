@@ -39,7 +39,7 @@ public class UnscentedKalmanFilterTest {
         result.set(2, 0, ((vr - vl) / (2.0 * rb)));
         result.set(3, 0,
                 k1 * ((C1 * vl) + (C2 * Vl)) +
-                k2 * ((C1 * vr) + (C2 * vr)));
+                k2 * ((C1 * vr) + (C2 * Vr)));
         result.set(4, 0,
                 k2 * ((C1 * vl) + (C2 * Vl)) +
                         k1 * ((C1 * vr) + (C2 * vr)));
