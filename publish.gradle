@@ -227,31 +227,31 @@ def pomConfig = {
     }
 }
 
-publishing {
-    publications {
-        mavenPublication(MavenPublication) {
-
-//            artifacts {
-//                archives sourcesJar
-//                archives javadocJar
-//                archives outputJar
-//                archives outputSourcesJar
-//                archives outputJavadocJar
+//publishing {
+//    publications {
+//        mavenPublication(MavenPublication) {
+//
+////            artifacts {
+////                archives sourcesJar
+////                archives javadocJar
+////                archives outputJar
+////                archives outputSourcesJar
+////                archives outputJavadocJar
+////            }
+//
+//            groupId 'edu.wpi.first'
+//            artifactId 'wpilibStateSpace'
+//            version '2020.0.1'
+//            pom.withXml {
+//                def root = asNode()
+//                root.appendNode('description', 'A vendor dependency for modern control theory in FRC')
+//                root.appendNode('name', 'WPILib State Space')
+//                root.appendNode('url', 'https://github.com/mcm001/WPILibStateSpace/')
+//                root.children().last() + pomConfig
 //            }
-
-            groupId 'edu.wpi.first'
-            artifactId 'wpilibStateSpace'
-            version '2020.0.1'
-            pom.withXml {
-                def root = asNode()
-                root.appendNode('description', 'A vendor dependency for modern control theory in FRC')
-                root.appendNode('name', 'WPILib State Space')
-                root.appendNode('url', 'https://github.com/mcm001/WPILibStateSpace/')
-                root.children().last() + pomConfig
-            }
-        }
-    }
-}
+//        }
+//    }
+//}
 
 //bintray {
 //    user = System.getProperty('bintray.user')
@@ -272,3 +272,5 @@ publishing {
 //    }
 //
 //}
+
+
