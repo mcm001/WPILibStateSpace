@@ -59,7 +59,7 @@ public final class StateSpaceUtilsJNI {
    *
    * (A,B) is stabilizable if and only if the uncontrollable eigenvalues of A, if
    * any, have absolute values less than one, where an eigenvalue is
-   * uncontrollable if rank(lambda * I - A, B) < n where n is number of states.
+   * uncontrollable if rank(lambda * I - A, B) &lt; n where n is number of states.
    *
    * @param A System matrix.
    * @param B Input matrix.

@@ -183,8 +183,6 @@ model {
       def found = false
       def systemArch = getCurrentArch()
       c.each {
-        println it
-        println it.name
         if (it in NativeExecutableSpec && it.name == "WPILibStateSpaceDev") {
           it.binaries.each {
             if (!found) {
