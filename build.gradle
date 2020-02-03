@@ -116,7 +116,7 @@ model {
             include '**/*.cpp'
           }
           exportedHeaders {
-            srcDirs 'src/main/native/include'
+            srcDirs 'src/main/native/include', 'src/main/native/eigeninclude'
           }
         }
       }
