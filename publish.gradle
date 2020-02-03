@@ -239,8 +239,8 @@ publishing {
 //                archives outputJavadocJar
 //            }
 
-            groupId 'wpilib-state-space'
-            artifactId 'wpilib-state-space'
+            groupId 'edu.wpi.first'
+            artifactId 'wpilibStateSpace'
             version '2020.0.1'
             pom.withXml {
                 def root = asNode()
@@ -253,22 +253,22 @@ publishing {
     }
 }
 
-bintray {
-    user = System.getProperty('bintray.user')
-    key = System.getProperty('bintray.key')
-    publications = ['mavenPublication']
-
-    pkg {
-        repo = 'wpilib-state-space'
-        name = 'wpilib-state-space'
-//        userOrg = 'mcm001'
-        licenses = ['Apache-2.0']
-        vcsUrl = 'https://github.com/mcm001/WPILibStateSpace.git'
-        version {
-            name = '2020.0.1'
-            desc = '2020.0.1'
-            released  = new Date()
-        }
-    }
-
-}
+//bintray {
+//    user = System.getProperty('bintray.user')
+//    key = System.getProperty('bintray.key')
+//    publications = ['mavenPublication']
+//
+//    pkg {
+//        repo = 'wpilib-state-space'
+//        name = 'wpilib-state-space'
+////        userOrg = 'mcm001'
+//        licenses = ['Apache-2.0']
+//        vcsUrl = 'https://github.com/mcm001/WPILibStateSpace.git'
+//        version {
+//            name = '2020.0.1'
+//            desc = '2020.0.1'
+//            released  = new Date()
+//        }
+//    }
+//
+//}
