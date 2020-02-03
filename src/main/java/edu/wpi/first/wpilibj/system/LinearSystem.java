@@ -364,98 +364,49 @@ public class LinearSystem<States extends Num, Inputs extends Num,
     public Matrix<Inputs, N1> clampInput(Matrix<Inputs, N1> u) {
         var result = new Matrix<Inputs, N1>(new SimpleMatrix(inputs.getNum(), 1));
         for (int i = 0; i < inputs.getNum(); i++) {
-            result.set(i, 0,
-                    MathUtil.clamp(
+            result.set(i, 0, MathUtil.clamp(
                             u.get(i, 0),
                             m_uMin.get(i, 0),
-                            m_uMax.get(i, 0)
-                    ));
+                            m_uMax.get(i, 0)));
         }
         return result;
     }
 
     public static LinearSystem<N2, N1, N1> createElevatorSystem(DCMotor motor, double massKg, double radiusMeters, double G, double maxVoltage) {
-        var A_ = new SimpleMatrix(2, 2);
-        var B_ = new SimpleMatrix(2, 1);
-        var C_ = new SimpleMatrix(1, 2);
-        var D_ = new SimpleMatrix(1, 1);
-        A_.setRow(0, 0, 0, 1);
-        A_.setRow(1, 0, 0,
-
-                -Math.pow(G, 2) * motor.KtNMPerAmp /
-                        (motor.Rohms * radiusMeters * radiusMeters * massKg * motor.KvRadPerSecPerVolt)
-
-        );
-
-//        System.out.printf("elevator A is %s", A_);
-
-        var A = new Matrix<N2, N2>(A_);
-
-        B_.setColumn(0, 0,
-                0, (G * motor.KtNMPerAmp / (motor.Rohms * radiusMeters * massKg)));
-        var B = new Matrix<N2, N1>(B_);
-
-        C_.setRow(0, 0, 1, 0);
-        var C = new Matrix<N1, N2>(C_);
-
-        D_.set(0, 0, 0);
-        var D = new Matrix<N1, N1>(D_);
-
-        var uMax = new Matrix<N1, N1>(new SimpleMatrix(1, 1));
-        uMax.set(0, 0, maxVoltage);
-        var uMin = uMax.times(-1);
-
-//        System.out.printf("Returning system with matricies: A: \n%s\nB:\n%s\nC:\n%s\nD:\n%s\n", A, B, C, D);
-
-        return new LinearSystem<>(Nat.N2(), Nat.N1(), Nat.N1(), A, B, C, D, uMin, uMax);
+        return new LinearSystem<>(Nat.N2(), Nat.N1(), Nat.N1(),
+            new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0, 1,
+                0, -Math.pow(G, 2) * motor.KtNMPerAmp /
+                    (motor.Rohms * radiusMeters * radiusMeters * massKg * motor.KvRadPerSecPerVolt)),
+            new MatBuilder<>(Nat.N2(), Nat.N1()).fill(
+                0, (G * motor.KtNMPerAmp / (motor.Rohms * radiusMeters * massKg))),
+            new MatBuilder<>(Nat.N1(), Nat.N2()).fill(1, 0),
+            MatrixUtils.zeros(Nat.N1()),
+            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(-maxVoltage),
+            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(maxVoltage));
     }
 
     public static LinearSystem<N1, N1, N1> createFlywheelSystem(DCMotor motor, double jKgSquaredMeters, double G, double maxVoltage) {
-        var A = new Matrix<N1, N1>(new SimpleMatrix(1, 1));
-        var B = new Matrix<N1, N1>(new SimpleMatrix(1, 1));
-        var C = new Matrix<N1, N1>(new SimpleMatrix(1, 1));
-        var D = new Matrix<N1, N1>(new SimpleMatrix(1, 1));
-
-        A.set(0, 0, -G * G * motor.KtNMPerAmp /
-                (motor.KvRadPerSecPerVolt * motor.Rohms * jKgSquaredMeters));
-        B.set(0, 0, G * motor.KtNMPerAmp / (motor.Rohms * jKgSquaredMeters));
-        C.set(0, 0, 1);
-        D.set(0, 0, 0);
-
-        var uMax = new Matrix<N1, N1>(new SimpleMatrix(1, 1));
-        uMax.set(0, 0, maxVoltage);
-        var uMin = uMax.times(-1);
-
-        return new LinearSystem<>(Nat.N1(), Nat.N1(), Nat.N1(), A, B, C, D, uMin, uMax);
+        return new LinearSystem<>(Nat.N1(), Nat.N1(), Nat.N1(),
+            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(
+                -G * G * motor.KtNMPerAmp /
+                    (motor.KvRadPerSecPerVolt * motor.Rohms * jKgSquaredMeters)),
+            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(G * motor.KtNMPerAmp / (motor.Rohms * jKgSquaredMeters)),
+            MatrixUtils.eye(Nat.N1()),
+            MatrixUtils.zeros(Nat.N1()),
+            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(-maxVoltage),
+            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(maxVoltage));
     }
 
     public static LinearSystem<N2, N1, N1> createSingleJointedArmSystem(DCMotor motor, double jKgSquaredMeters, double G, double maxVoltage) {
-        var A_ = new SimpleMatrix(2, 2);
-        var B_ = new SimpleMatrix(2, 1);
-        var C_ = new SimpleMatrix(1, 2);
-        var D_ = new SimpleMatrix(1, 1);
-        A_.setRow(0, 0, 0, 1);
-        A_.setRow(1, 0, 0,
-                -Math.pow(G, 2) * motor.KtNMPerAmp /
-                        (motor.KvRadPerSecPerVolt * motor.Rohms * jKgSquaredMeters)
-        );
-        var A = new Matrix<N2, N2>(A_);
-
-        B_.setColumn(0, 0,
-                0, (G * motor.KtNMPerAmp / (motor.Rohms * jKgSquaredMeters)));
-        var B = new Matrix<N2, N1>(B_);
-
-        C_.setRow(0, 0, 1, 0);
-        var C = new Matrix<N1, N2>(C_);
-
-        D_.set(0, 0, 0);
-        var D = new Matrix<N1, N1>(D_);
-
-        var uMax = new Matrix<N1, N1>(new SimpleMatrix(1, 1));
-        uMax.set(0, 0, maxVoltage);
-        var uMin = uMax.times(-1);
-
-        return new LinearSystem<>(Nat.N2(), Nat.N1(), Nat.N1(), A, B, C, D, uMin, uMax);
+        return new LinearSystem<>(Nat.N2(), Nat.N1(), Nat.N1(),
+            new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0, 1,
+                0, -Math.pow(G, 2) * motor.KtNMPerAmp /
+                    (motor.KvRadPerSecPerVolt * motor.Rohms * jKgSquaredMeters)),
+            new MatBuilder<>(Nat.N2(), Nat.N1()).fill(0, (G * motor.KtNMPerAmp / (motor.Rohms * jKgSquaredMeters))),
+            new MatBuilder<>(Nat.N1(), Nat.N2()).fill(1, 0),
+            MatrixUtils.zeros(Nat.N1()),
+            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(-maxVoltage),
+            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(maxVoltage));
     }
 
     @Override

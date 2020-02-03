@@ -21,6 +21,7 @@ import org.junit.Test;
 import org.knowm.xchart.SwingWrapper;
 import org.knowm.xchart.XYChartBuilder;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -117,8 +118,8 @@ public class KalmanFilterTest {
 //            new SwingWrapper<>(chart).displayChart();
 //            Thread.sleep(10000000);
 //        } catch (Exception ign) {}
-        Assert.assertEquals(0.0, swerveObserverSystem.getX(0), 0.1);
-        Assert.assertEquals(0.0, swerveObserverSystem.getX(0), 0.1);
+        Assert.assertEquals(0.0, swerveObserverSystem.getX(0), 0.3);
+        Assert.assertEquals(0.0, swerveObserverSystem.getX(0), 0.3);
     }
 
     @Test
@@ -174,5 +175,71 @@ public class KalmanFilterTest {
         Assert.assertEquals(0.0, swerveObserverSystem.getX(1), 0.2);
     }
 
+    @Test
+    public void testSwerveKFMovingOverTrajectory() {
 
+        var random = new Random();
+        swerveObserverSystem.reset();
+
+        var filter = new KalmanFilter<>(Nat.N6(), Nat.N3(), Nat.N3(),
+            swerveObserverSystem,
+            new MatBuilder<>(Nat.N6(), Nat.N1()).fill( 0.1, 0.1, 0.1, 0.1, 0.1, 0.1 ), // state weights
+            new MatBuilder<>(Nat.N3(), Nat.N1()).fill( 4, 4, 4), // measurement weights
+            0.020
+        );
+
+        List<Double> xhatsX = new ArrayList<>();
+        List<Double> measurementsX = new ArrayList<>();
+        List<Double> xhatsY = new ArrayList<>();
+        List<Double> measurementsY = new ArrayList<>();
+
+        var trajectory = TrajectoryGenerator.generateTrajectory(
+            List.of(
+                new Pose2d(0, 0, new Rotation2d()),
+                new Pose2d(5, 5, new Rotation2d())
+            ), new TrajectoryConfig(2, 2)
+        );
+        var time = 0.0;
+        var lastVelocity = new MatBuilder<>(Nat.N3(), Nat.N1()).fill(0.0, 0.0, 0.0);
+
+        while(time <= trajectory.getTotalTimeSeconds()) {
+            var sample = trajectory.sample(time);
+            var measurement = new MatBuilder<>(Nat.N3(), Nat.N1()).fill(
+                sample.poseMeters.getTranslation().getX() + random.nextGaussian() / 5d,
+                sample.poseMeters.getTranslation().getY() + random.nextGaussian() / 5d,
+                sample.poseMeters.getRotation().getRadians() + random.nextGaussian() / 3d // std dev of [1, 1, 1]
+            );
+
+            var velocity = new MatBuilder<>(Nat.N3(), Nat.N1()).fill(
+                sample.velocityMetersPerSecond * sample.poseMeters.getRotation().getCos(),
+                sample.velocityMetersPerSecond * sample.poseMeters.getRotation().getSin(),
+                sample.curvatureRadPerMeter * sample.velocityMetersPerSecond
+            );
+            var u = (velocity.minus(lastVelocity)).div(0.020);
+            lastVelocity = velocity;
+
+            filter.correct(u, measurement);
+            filter.predict(u, 0.020);
+
+            measurementsX.add(measurement.get(0, 0));
+            measurementsY.add(measurement.get(1, 0));
+            xhatsX.add(filter.getXhat(0));
+            xhatsY.add(filter.getXhat(1));
+
+            time += 0.020;
+        }
+
+        var chart = new XYChartBuilder().build();
+        chart.addSeries("Xhat, x/y", xhatsX, xhatsY);
+        chart.addSeries("Measured position, x/y", measurementsX, measurementsY);
+        try {
+//            new SwingWrapper<>(chart).displayChart();
+//            Thread.sleep(10000000);
+        } catch (Exception ign) {}
+
+        Assert.assertEquals(trajectory.sample(trajectory.getTotalTimeSeconds()).poseMeters.getTranslation().getX(),
+            swerveObserverSystem.getX(0), 0.2);
+        Assert.assertEquals(trajectory.sample(trajectory.getTotalTimeSeconds()).poseMeters.getTranslation().getY(),
+            swerveObserverSystem.getX(1), 0.2);
+    }
 }
