@@ -263,7 +263,7 @@ public class StateSpaceUtils {
          *       disclaimer in the documentation and/or other materials provided
          *       with the distribution.
          *
-         *     * Neither the name of the Technische Universität Berlin nor the
+         *     * Neither the name of the Technische Universitat Berlin nor the
          *       names of its contributors may be used to endorse or promote
          *       products derived from this software without specific prior
          *       written permission.
