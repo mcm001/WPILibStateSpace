@@ -235,4 +235,4 @@ stages:
               sourceFolder: 'build-tools/repos/releases'
               contents: '**'
               targetFolder: '/var/www/html/releases/'
-              cleanTargetFolder: true
+              cleanTargetFolder: false
