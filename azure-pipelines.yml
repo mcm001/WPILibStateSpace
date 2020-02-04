@@ -196,8 +196,8 @@ stages:
         steps:
           - checkout: none
           - script: |
-              git clone https://github.com/mcm001/build-tools
-            displayName: 'Clone Combiner'
+              mkdir build-tools
+            displayName: 'Setup combiner'
           - task: DownloadPipelineArtifact@0
             inputs:
               artifactName: 'Mac'
@@ -223,15 +223,10 @@ stages:
               artifactName: 'Aarch64'
               targetPath: 'build-tools/repos'
 
-          # Combine with script
-          - script: |
-              cd build-tools && chmod +x combine.sh && ./combine.sh
-            displayName: 'Combine artifacts'
-
           - task: PublishPipelineArtifact@0
             inputs:
               artifactName: 'CombinedBuild'
-              targetPath: '
+              targetPath: 'build-tools/repos'
               
           - task: CopyFilesOverSSH@0
             inputs:
