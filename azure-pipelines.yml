@@ -196,7 +196,7 @@ stages:
         steps:
           - checkout: none
           - script: |
-              rm build-tools && git clone https://github.com/mcm001/build-tools
+              git clone https://github.com/mcm001/build-tools
             displayName: 'Clone Combiner'
           - task: DownloadPipelineArtifact@0
             inputs:
