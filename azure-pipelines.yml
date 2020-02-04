@@ -196,7 +196,7 @@ stages:
         steps:
           - checkout: none
           - script: |
-              git clone https://github.com/mcm001/build-tools
+              rm build-tools && git clone https://github.com/mcm001/build-tools
             displayName: 'Clone Combiner'
           - task: DownloadPipelineArtifact@0
             inputs:
@@ -227,6 +227,11 @@ stages:
           - script: |
               cd build-tools && chmod +x combine.sh && ./combine.sh
             displayName: 'Combine artifacts'
+
+          - task: PublishPipelineArtifact@0
+            inputs:
+              artifactName: 'CombinedBuild'
+              targetPath: 'build-tools/repos'
 
 #
 #          - task: Gradle@2
