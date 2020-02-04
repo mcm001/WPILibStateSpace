@@ -36,7 +36,7 @@ stages:
 
         steps:
           - task: Gradle@2
-            condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
+            condition: succeeded()
             inputs:
               workingDirectory: ''
               gradleWrapperFile: 'gradlew'
@@ -60,7 +60,7 @@ stages:
 
         steps:
           - task: Gradle@2
-            condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
+            condition: succeeded()
             inputs:
               workingDirectory: ''
               gradleWrapperFile: 'gradlew'
@@ -85,7 +85,7 @@ stages:
 
         steps:
           - task: Gradle@2
-            condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
+            condition: succeeded()
             inputs:
               workingDirectory: ''
               gradleWrapperFile: 'gradlew'
@@ -107,7 +107,7 @@ stages:
         timeoutInMinutes: 0
         steps:
           - task: Gradle@2
-            condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
+            condition: succeeded()
             inputs:
               workingDirectory: ''
               gradleWrapperFile: 'gradlew'
@@ -142,7 +142,7 @@ stages:
               jdkArchitectureOption: x86
 
           - task: Gradle@2
-            condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
+            condition: succeeded()
             inputs:
               workingDirectory: ''
               gradleWrapperFile: 'gradlew'
@@ -169,7 +169,7 @@ stages:
             displayName: 'Setup JDK'
 
           - task: Gradle@2
-            condition: and(succeeded(), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v')))
+            condition: succeeded()
             inputs:
               workingDirectory: ''
               gradleWrapperFile: 'gradlew'
@@ -229,6 +229,7 @@ stages:
               targetPath: 'build-tools/repos'
               
           - task: CopyFilesOverSSH@0
+            condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
             inputs:
               sshEndpoint: 'meshnet0'
               sourceFolder: 'build-tools/repos/releases'
