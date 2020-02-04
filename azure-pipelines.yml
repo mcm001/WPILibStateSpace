@@ -44,18 +44,7 @@ stages:
               publishJUnitResults: true
               testResultsFiles: '**/TEST-*.xml'
               tasks: 'build'
-              options: '-Ponlylinuxaarch64bionic -PbuildServer'
-
-          - task: Gradle@2
-            condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
-            inputs:
-              workingDirectory: ''
-              gradleWrapperFile: 'gradlew'
-              gradleOptions: '-Xmx3072m'
-              publishJUnitResults: true
-              testResultsFiles: '**/TEST-*.xml'
-              tasks: 'build'
-              options: '-Ponlylinuxaarch64bionic -PreleaseMode -PbuildServer'
+              options: '-Ponlylinuxaarch64bionic -PbuildServer -x check'
 
           - task: PublishPipelineArtifact@0
             inputs:
@@ -80,18 +69,7 @@ stages:
               publishJUnitResults: true
               testResultsFiles: '**/TEST-*.xml'
               tasks: 'build'
-              options: '-PbuildServer'
-
-          - task: Gradle@2
-            condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
-            inputs:
-              workingDirectory: ''
-              gradleWrapperFile: 'gradlew'
-              gradleOptions: '-Xmx3072m'
-              publishJUnitResults: true
-              testResultsFiles: '**/TEST-*.xml'
-              tasks: 'build'
-              options: '-PreleaseMode -PbuildServer'
+              options: '-x check'
 
           - task: PublishPipelineArtifact@0
             inputs:
@@ -114,19 +92,7 @@ stages:
               publishJUnitResults: true
               testResultsFiles: '**/TEST-*.xml'
               tasks: 'build'
-              options: '-PskipPMD -PbuildServer'
-
-          - task: Gradle@2
-            condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
-            inputs:
-              workingDirectory: ''
-              gradleWrapperFile: 'gradlew'
-              gradleOptions: '-Xmx3072m'
-              jdkVersionOption: '1.11'
-              publishJUnitResults: true
-              testResultsFiles: '**/TEST-*.xml'
-              tasks: 'build'
-              options: '-PskipPMD -PreleaseMode -PbuildServer'
+              options: '-x check'
 
           - task: PublishPipelineArtifact@0
             inputs:
@@ -160,18 +126,7 @@ stages:
               publishJUnitResults: true
               testResultsFiles: '**/TEST-*.xml'
               tasks: 'build'
-              options: '-PskipPMD -PbuildServer'
-
-          - task: Gradle@2
-            condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
-            inputs:
-              workingDirectory: ''
-              gradleWrapperFile: 'gradlew'
-              gradleOptions: '-Xmx1024m'
-              publishJUnitResults: true
-              testResultsFiles: '**/TEST-*.xml'
-              tasks: 'build'
-              options: '-PskipPMD -PreleaseMode -PbuildServer'
+              options: '-x check'
 
           - task: PublishPipelineArtifact@0
             inputs:
@@ -199,19 +154,7 @@ stages:
               publishJUnitResults: true
               testResultsFiles: '**/TEST-*.xml'
               tasks: 'build'
-              options: '-PbuildServer'
-
-          - task: Gradle@2
-            condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
-            inputs:
-              workingDirectory: ''
-              gradleWrapperFile: 'gradlew'
-              gradleOptions: '-Xmx3072m'
-              jdkVersionOption: '1.11'
-              publishJUnitResults: true
-              testResultsFiles: '**/TEST-*.xml'
-              tasks: 'build'
-              options: '-PreleaseMode -PbuildServer'
+              options: '-x check'
 
           - task: PublishPipelineArtifact@0
             inputs:
