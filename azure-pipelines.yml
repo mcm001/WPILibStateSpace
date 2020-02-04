@@ -43,13 +43,13 @@ stages:
               gradleOptions: '-Xmx3072m'
               publishJUnitResults: false
               testResultsFiles: '**/TEST-*.xml'
-              tasks: 'build'
+              tasks: 'build publish'
               options: '-x check'
 
           - task: PublishPipelineArtifact@0
             inputs:
               artifactName: 'Athena'
-              targetPath: 'build/allOutputs'
+              targetPath: 'build/repos'
       - job: Linux_Aarch64
         pool:
           vmImage: 'Ubuntu 16.04'
@@ -67,13 +67,13 @@ stages:
               gradleOptions: '-Xmx3072m'
               publishJUnitResults: true
               testResultsFiles: '**/TEST-*.xml'
-              tasks: 'build'
-              options: '-Ponlylinuxaarch64bionic -PbuildServer -x check'
+              tasks: 'build publish'
+              options: '-x check'
 
           - task: PublishPipelineArtifact@0
             inputs:
               artifactName: 'Aarch64'
-              targetPath: 'build/allOutputs'
+              targetPath: 'build/repos'
 
       - job: Linux
         pool:
@@ -92,13 +92,13 @@ stages:
               gradleOptions: '-Xmx3072m'
               publishJUnitResults: true
               testResultsFiles: '**/TEST-*.xml'
-              tasks: 'build'
+              tasks: 'build publish'
               options: '-x check'
 
           - task: PublishPipelineArtifact@0
             inputs:
               artifactName: 'Linux'
-              targetPath: 'build/allOutputs'
+              targetPath: 'build/repos'
 
       - job: Windows_64_Bit
         pool:
@@ -115,13 +115,13 @@ stages:
               jdkVersionOption: '1.11'
               publishJUnitResults: true
               testResultsFiles: '**/TEST-*.xml'
-              tasks: 'build'
+              tasks: 'build publish'
               options: '-x check'
 
           - task: PublishPipelineArtifact@0
             inputs:
               artifactName: 'Win64'
-              targetPath: 'build/allOutputs'
+              targetPath: 'build/repos'
 
       - job: Windows_32_Bit
         pool:
@@ -149,13 +149,13 @@ stages:
               gradleOptions: '-Xmx1024m'
               publishJUnitResults: true
               testResultsFiles: '**/TEST-*.xml'
-              tasks: 'build'
+              tasks: 'build publish'
               options: '-x check'
 
           - task: PublishPipelineArtifact@0
             inputs:
               artifactName: 'Win32'
-              targetPath: 'build/allOutputs'
+              targetPath: 'build/repos'
 
       - job: Mac
         pool:
@@ -177,13 +177,13 @@ stages:
               jdkVersionOption: '1.11'
               publishJUnitResults: true
               testResultsFiles: '**/TEST-*.xml'
-              tasks: 'build'
+              tasks: 'build publish'
               options: '-x check'
 
           - task: PublishPipelineArtifact@0
             inputs:
               artifactName: 'Mac'
-              targetPath: 'build/allOutputs'
+              targetPath: 'build/repos'
 
   - stage: Combine
     jobs:
@@ -201,27 +201,27 @@ stages:
           - task: DownloadPipelineArtifact@0
             inputs:
               artifactName: 'Mac'
-              targetPath: 'build-tools/combiner/products/build/allOutputs'
+              targetPath: 'build-tools/repos'
           - task: DownloadPipelineArtifact@0
             inputs:
               artifactName: 'Win32'
-              targetPath: 'build-tools/combiner/products/build/allOutputs'
+              targetPath: 'build-tools/repos'
           - task: DownloadPipelineArtifact@0
             inputs:
               artifactName: 'Win64'
-              targetPath: 'build-tools/combiner/products/build/allOutputs'
+              targetPath: 'build-tools/repos'
           - task: DownloadPipelineArtifact@0
             inputs:
               artifactName: 'Linux'
-              targetPath: 'build-tools/combiner/products/build/allOutputs'
+              targetPath: 'build-tools/repos'
           - task: DownloadPipelineArtifact@0
             inputs:
               artifactName: 'Athena'
-              targetPath: 'build-tools/combiner/products/build/allOutputs'
+              targetPath: 'build-tools/repos'
           - task: DownloadPipelineArtifact@0
             inputs:
               artifactName: 'Aarch64'
-              targetPath: 'build-tools/combiner/products/build/allOutputs'
+              targetPath: 'build-tools/repos'
 
           # PR Builds
           - task: Gradle@2
@@ -232,34 +232,6 @@ stages:
               tasks: 'publish '
               options: '-x check'
             condition: and(succeeded(), and(ne(variables['Build.SourceBranch'], 'refs/heads/master'), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))))
-
-          # Master Builds
-          - task: Gradle@2
-            inputs:
-              workingDirectory: 'build-tools/combiner'
-              gradleWrapperFile: 'build-tools/combiner/gradlew'
-              gradleOptions: '-Xmx3072m'
-              tasks: 'publish '
-              options: '-x check'
-            condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-            env:
-              RUN_AZURE_ARTIFACTORY_RELEASE: 'TRUE'
-              ARTIFACTORY_PUBLISH_USERNAME: $(PublishUserName)
-              ARTIFACTORY_PUBLISH_PASSWORD: $(PublishPassword)
-
-          # Tagged Builds
-          - task: Gradle@2
-            inputs:
-              workingDirectory: 'build-tools/combiner'
-              gradleWrapperFile: 'build-tools/combiner/gradlew'
-              gradleOptions: '-Xmx3072m'
-              tasks: 'publish '
-              options: '-x check'
-            condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
-            env:
-              RUN_AZURE_ARTIFACTORY_RELEASE: 'TRUE'
-              ARTIFACTORY_PUBLISH_USERNAME: $(PublishUserName)
-              ARTIFACTORY_PUBLISH_PASSWORD: $(PublishPassword)
 
           - script: |
               echo "##vso[task.setvariable variable=UserHome]$HOME"
