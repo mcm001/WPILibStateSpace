@@ -44,18 +44,7 @@ stages:
               publishJUnitResults: false
               testResultsFiles: '**/TEST-*.xml'
               tasks: 'build'
-              options: '-Ponlylinuxathena -PbuildServer'
-
-          - task: Gradle@2
-            condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
-            inputs:
-              workingDirectory: ''
-              gradleWrapperFile: 'gradlew'
-              gradleOptions: '-Xmx3072m'
-              publishJUnitResults: false
-              testResultsFiles: '**/TEST-*.xml'
-              tasks: 'build'
-              options: '-Ponlylinuxathena -PreleaseMode -PbuildServer'
+              options: '-x check'
 
           - task: PublishPipelineArtifact@0
             inputs:
