@@ -192,10 +192,6 @@ stages:
               targetPath: 'build-tools/combiner/products/build/allOutputs'
           - task: DownloadPipelineArtifact@0
             inputs:
-              artifactName: 'Raspbian'
-              targetPath: 'build-tools/combiner/products/build/allOutputs'
-          - task: DownloadPipelineArtifact@0
-            inputs:
               artifactName: 'Athena'
               targetPath: 'build-tools/combiner/products/build/allOutputs'
           - task: DownloadPipelineArtifact@0
@@ -210,7 +206,7 @@ stages:
               gradleWrapperFile: 'build-tools/combiner/gradlew'
               gradleOptions: '-Xmx3072m'
               tasks: 'publish '
-              options: '-Pallwpilib'
+              options: '-x check'
             condition: and(succeeded(), and(ne(variables['Build.SourceBranch'], 'refs/heads/master'), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))))
 
           # Master Builds
@@ -220,7 +216,7 @@ stages:
               gradleWrapperFile: 'build-tools/combiner/gradlew'
               gradleOptions: '-Xmx3072m'
               tasks: 'publish '
-              options: '-Pallwpilib'
+              options: '-x check'
             condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
             env:
               RUN_AZURE_ARTIFACTORY_RELEASE: 'TRUE'
@@ -234,7 +230,7 @@ stages:
               gradleWrapperFile: 'build-tools/combiner/gradlew'
               gradleOptions: '-Xmx3072m'
               tasks: 'publish '
-              options: '-Pallwpilib -PreleaseRepoPublish'
+              options: '-x check'
             condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))
             env:
               RUN_AZURE_ARTIFACTORY_RELEASE: 'TRUE'
