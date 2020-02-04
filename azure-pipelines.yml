@@ -231,14 +231,12 @@ stages:
           - task: PublishPipelineArtifact@0
             inputs:
               artifactName: 'CombinedBuild'
-              targetPath: 'build-tools/repos'
-
-#
-#          - task: Gradle@2
-#            inputs:
-#              workingDirectory: 'build-tools/combiner'
-#              gradleWrapperFile: 'build-tools/combiner/gradlew'
-#              gradleOptions: '-Xmx3072m'
-#              tasks: 'publish '
-#              options: '-x check'
-#            condition: and(succeeded(), and(ne(variables['Build.SourceBranch'], 'refs/heads/master'), not(startsWith(variables['Build.SourceBranch'], 'refs/tags/v'))))
+              targetPath: '
+              
+          - task: CopyFilesOverSSH@0
+            inputs:
+              sshEndpoint: 'meshnet0'
+              sourceFolder: 'build-tools/repos/releases'
+              contents: '**'
+              targetFolder: '/var/www/html/releases/'
+              cleanTargetFolder: true
