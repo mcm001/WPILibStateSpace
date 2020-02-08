@@ -409,6 +409,64 @@ public class LinearSystem<States extends Num, Inputs extends Num,
             new MatBuilder<>(Nat.N1(), Nat.N1()).fill(maxVoltage));
     }
 
+    /**
+     * Identify a velocity system from it's kV (volts/(unit/sec)) and kA (volts/(unit/sec^2).
+     * These constants cam be found using frc-characterization.
+     *
+     * @see <a href="https://github.com/wpilibsuite/frc-characterization"> https://github.com/wpilibsuite/frc-characterization</a>
+     */
+    public static LinearSystem<N1, N1, N1> identifyVelocitySystem(double kV, double kA, double maxVoltage) {
+        return new LinearSystem<>(Nat.N1(), Nat.N1(), Nat.N1(),
+            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(-kV / kA),
+            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(1.0 / kA),
+            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(1.0),
+            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(0.0),
+            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(-maxVoltage),
+            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(maxVoltage));
+    }
+
+    /**
+     * Identify a position system from it's kV (volts/(unit/sec)) and kA (volts/(unit/sec^2).
+     * These constants cam be found using frc-characterization.
+     *
+     * @see <a href="https://github.com/wpilibsuite/frc-characterization"> https://github.com/wpilibsuite/frc-characterization</a>
+     */
+    public static LinearSystem<N2, N1, N1> identifyPositionSystem(double kV, double kA, double maxVoltage) {
+        return new LinearSystem<>(Nat.N2(), Nat.N1(), Nat.N1(),
+            new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0.0, 1.0, 0.0, -kV / kA),
+            new MatBuilder<>(Nat.N2(), Nat.N1()).fill(0.0, 1.0 / kA),
+            new MatBuilder<>(Nat.N1(), Nat.N2()).fill(1.0, 0.0),
+            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(0.0),
+            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(-maxVoltage),
+            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(maxVoltage));
+    }
+
+    /**
+     * Identify a standard differential drive drivetrain, given the drivetrain's
+     * kV and kA in both linear (volts/(meter/sec) and volts/(meter/sec^2)) and
+     * angular (volts/(radian/sec) and volts/(radian/sec^2)) cases. This can be
+     * found using frc-characterization.
+     *
+     * @see <a href="https://github.com/wpilibsuite/frc-characterization"> https://github.com/wpilibsuite/frc-characterization</a>
+     */
+    public static LinearSystem<N2, N2, N2> identifyDrivetrainSystem(
+        double kVLinear, double kALinear, double kVAngular, double kAAngular, double maxVoltage) {
+
+        final double c = 0.5 / (kALinear * kAAngular);
+        final double A1 = c * (-kALinear * kVAngular - kVLinear * kAAngular);
+        final double A2 = c * (kALinear * kVAngular - kVLinear * kAAngular);
+        final double B1 = c * (kALinear + kAAngular);
+        final double B2 = c * (kAAngular - kALinear);
+
+        return new LinearSystem<>(Nat.N2(), Nat.N2(), Nat.N2(),
+            new MatBuilder<>(Nat.N2(), Nat.N2()).fill(A1, A2, A2, A1),
+            new MatBuilder<>(Nat.N2(), Nat.N2()).fill(B1, B2, B2, B1),
+            new MatBuilder<>(Nat.N2(), Nat.N2()).fill(1, 0, 0, 1),
+            new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0, 0, 0, 0),
+            new MatBuilder<>(Nat.N2(), Nat.N1()).fill(-maxVoltage, -maxVoltage),
+            new MatBuilder<>(Nat.N2(), Nat.N1()).fill(maxVoltage, maxVoltage));
+    }
+
     @Override
     public String toString() {
         return String.format("Linear System: A\n%s\n\nB:\n%s\n\nC:\n%s\n\nD:\n%s\n", m_A.getStorage(), m_B.getStorage(), m_C.getStorage(), m_D.getStorage());
