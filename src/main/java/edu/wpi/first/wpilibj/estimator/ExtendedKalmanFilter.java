@@ -14,6 +14,8 @@ import edu.wpi.first.wpiutil.math.Num;
 
 public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Outputs extends Num> {
 
+    private final boolean m_useRungeKutta;
+
     private final Nat<States> m_states;
     private final Nat<Inputs> m_inputs;
     private final Nat<Outputs> m_outputs;
@@ -38,7 +40,8 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
      *                           the measurement vector.
      * @param stateStdDevs       Standard deviations of model states.
      * @param measurementStdDevs Standard deviations of measurements.
-     * @param dt                 Nominal discretization timestep.
+     * @param useRungeKutta      Whether or not to numerically integrate f; intended for situations where f is continous
+     * @param dtSeconds          Nominal discretization timestep.
      */
     public ExtendedKalmanFilter(
         Nat<States> states,
@@ -48,8 +51,11 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
         BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<Outputs, N1>> h,
         Matrix<States, N1> stateStdDevs,
         Matrix<Outputs, N1> measurementStdDevs,
+        boolean useRungeKutta,
         double dtSeconds
     ) {
+        m_useRungeKutta = useRungeKutta;
+
         m_states = states;
         m_inputs = inputs;
         m_outputs = outputs;
@@ -140,8 +146,8 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
     /**
      * Project the model into the future with a new control input u.
      *
-     * @param u  New control input from controller.
-     * @param dt Timestep for prediction.
+     * @param u         New control input from controller.
+     * @param dtSeconds Timestep for prediction.
      */
     public void predict(Matrix<Inputs, N1> u, double dtSeconds) {
         predict(u, m_f, dtSeconds);
@@ -160,7 +166,12 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
         final var discA = discPair.getFirst();
         final var discQ = discPair.getSecond();
 
-        m_xHat = RungeKuttaHelper.rungeKutta(f, m_xHat, u, dtSeconds);
+        if (m_useRungeKutta) {
+            m_xHat = RungeKuttaHelper.rungeKutta(f, m_xHat, u, dtSeconds);
+        } else {
+            m_xHat = f.apply(m_xHat, u);
+        }
+
         m_P = discA.times(m_P).times(discA.transpose()).plus(discQ);
         m_discR = StateSpaceUtils.discretizeR(m_contR, dtSeconds);
     }
