@@ -27,7 +27,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
     private Matrix<States, States> m_P;
     private final Matrix<States, States> m_contQ;
     private final Matrix<Outputs, Outputs> m_contR;
-    private Matrix<Outputs, Outputs> m_discR;
+    private final Matrix<Outputs, Outputs> m_discR;
 
     private final Matrix<States, States> m_initP;
 
@@ -77,7 +77,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
 
         m_discR = StateSpaceUtils.discretizeR(m_contR, dtSeconds);
 
-        if (StateSpaceUtils.isStabilizable(discA.transpose(), C.transpose())) {
+        if (StateSpaceUtils.isStabilizable(discA.transpose(), C.transpose()) && outputs.getNum() <= states.getNum()) {
             m_initP = new Matrix<>(Drake.discreteAlgebraicRiccatiEquation(discA.transpose(), C.transpose(), discQ, m_discR));
         } else {
             m_initP = MatrixUtils.zeros(states, states);
@@ -101,6 +101,15 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
      */
     public double getP(int i, int j) {
         return m_P.get(i, j);
+    }
+
+    /**
+     * Sets the entire error covariance matrix P.
+     *
+     * @param newP The new value of P to use.
+     */
+    public void setP(Matrix<States, States> newP) {
+        m_P = newP;
     }
 
     /**
@@ -173,7 +182,6 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
         }
 
         m_P = discA.times(m_P).times(discA.transpose()).plus(discQ);
-        m_discR = StateSpaceUtils.discretizeR(m_contR, dtSeconds);
     }
 
     /**

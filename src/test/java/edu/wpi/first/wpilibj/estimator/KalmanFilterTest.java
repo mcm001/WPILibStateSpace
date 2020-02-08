@@ -14,7 +14,6 @@ import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.numbers.N3;
 import edu.wpi.first.wpiutil.math.numbers.N6;
-import javafx.scene.chart.XYChart;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.Assert;
 import org.junit.Test;
