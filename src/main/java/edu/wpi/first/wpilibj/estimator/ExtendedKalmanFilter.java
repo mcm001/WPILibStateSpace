@@ -68,8 +68,8 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
         m_contQ = StateSpaceUtils.makeCovMatrix(states, stateStdDevs);
         m_contR = StateSpaceUtils.makeCovMatrix(outputs, measurementStdDevs);
 
-        final var contA = NumericalJacobian.numericalJacobianX(states, states, f, m_xHat, MatrixUtils.zeros(m_inputs));
-        final var C = NumericalJacobian.numericalJacobianX(outputs, states, h, m_xHat, MatrixUtils.zeros(m_inputs));
+        final var contA = NumericalJacobian.numericalJacobianX(states, states, f, m_xHat, MatrixUtils.zeros(inputs));
+        final var C = NumericalJacobian.numericalJacobianX(outputs, states, h, m_xHat, MatrixUtils.zeros(inputs));
 
         final var discPair = StateSpaceUtils.discretizeAQTaylor(contA, m_contQ, dtSeconds);
         final var discA = discPair.getFirst();

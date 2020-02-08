@@ -156,12 +156,15 @@ public class ExtendedKalmanFilterTest {
     public void testLocalization() {
         /**
          * Our state-space system is: x = [[x, y, dtheta]]^T in the field coordinate
-         * system u = [[v_l, v_r, theta]]^T Not actual inputs, but the dynamics math
-         * required to use actual inputs like voltage is gross. y = [[x_s, y_s, theta_s,
-         * x_r, y_r, theta_r]]^T All the subscript s ones are measurements from vSLAM,
-         * while the sub r ones are from retroreflective tape vision. Most people
-         * probably only have the retroreflective tape PnP measurements, but my setup is
-         * a little extra.
+         * system
+         * 
+         * u = [[v_l, v_r, theta]]^T Not actual inputs, but the dynamics math required
+         * to use actual inputs like voltage is gross.
+         * 
+         * y = [[x_s, y_s, theta_s, x_r, y_r, theta_r]]^T All the subscript s ones are
+         * measurements from vSLAM, while the sub r ones are from retroreflective tape
+         * vision. Most people probably only have the retroreflective tape PnP
+         * measurements, but my setup is a little extra.
          */
 
         double dt = 0.01; // The (nominal) loop time of the observer
@@ -173,7 +176,7 @@ public class ExtendedKalmanFilterTest {
                     .exp(new Twist2d((u.get(0, 0) + u.get(1, 0)) / 2, 0.0, u.get(2, 0)));
 
             return new MatBuilder<>(Nat.N3(), Nat.N1()).fill(newPose.getTranslation().getX(),
-                    newPose.getTranslation().getY(), newPose.getRotation().getRadians());
+                    newPose.getTranslation().getY(), x.get(2, 0) + u.get(2, 0));
         };
 
         BiFunction<Matrix<N3, N1>, Matrix<N3, N1>, Matrix<N6, N1>> h = (x, u) -> {
