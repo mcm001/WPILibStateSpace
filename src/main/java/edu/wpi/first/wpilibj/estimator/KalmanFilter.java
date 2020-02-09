@@ -76,10 +76,8 @@ public class KalmanFilter<States extends Num, Inputs extends Num,
 
         m_discR = StateSpaceUtils.discretizeR(m_contR, dtSeconds);
 
-        m_P = new Matrix<>(Drake.discreteAlgebraicRiccatiEquation(discA.transpose(), plant.getC().transpose(), discQ, m_discR));
-
         if (StateSpaceUtils.isStabilizable(discA.transpose(),
-            plant.getC().transpose())) {
+            plant.getC().transpose()) && outputs.getNum() <= states.getNum()) {
             m_P = new Matrix<>(Drake.discreteAlgebraicRiccatiEquation(
                 discA.transpose(), plant.getC().transpose(), discQ, m_discR));
         } else {

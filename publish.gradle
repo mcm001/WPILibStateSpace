@@ -6,7 +6,7 @@ apply plugin: 'maven'
 
 ext.licenseFile = files("$rootDir/LICENSE.txt")
 
-def pubVersion = '2020.2.3'
+def pubVersion = '2020.2.4'
 
 def outputsFolder = file("$buildDir/allOutputs")
 
