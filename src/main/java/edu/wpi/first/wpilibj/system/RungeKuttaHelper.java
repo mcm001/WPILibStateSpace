@@ -19,7 +19,7 @@ public class RungeKuttaHelper {
      * @param dtSeconds The time over which to integrate.
      * @return
      */
-    public static double RungeKutta(
+    public static double rungeKutta(
             DoubleFunction<Double> f,
             double x,
             double dtSeconds
@@ -40,9 +40,8 @@ public class RungeKuttaHelper {
      * @param x The initial value of x.
      * @param u The value u held constant over the integration period.
      * @param dtSeconds The time over which to integrate.
-     * @return
      */
-    public static double RungeKutta(
+    public static double rungeKutta(
             BiFunction<Double, Double, Double> f,
             double x, Double u, double dtSeconds
     ) {
@@ -62,7 +61,7 @@ public class RungeKuttaHelper {
      * @param u  The value u held constant over the integration period.
      * @param dtSeconds The time over which to integrate.
      */
-    public static <States extends Num, Inputs extends Num> Matrix<States, N1> RungeKutta(
+    public static <States extends Num, Inputs extends Num> Matrix<States, N1> rungeKutta(
             BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
             Matrix<States, N1> x, Matrix<Inputs, N1> u, double dtSeconds) {
 
@@ -81,7 +80,7 @@ public class RungeKuttaHelper {
      * @param x  The initial value of x.
      * @param dtSeconds The time over which to integrate.
      */
-    public static <States extends Num> Matrix<States, N1> RungeKutta(
+    public static <States extends Num> Matrix<States, N1> rungeKutta(
             Function<Matrix<States, N1>, Matrix<States, N1>> f,
             Matrix<States, N1> x, double dtSeconds) {
 
