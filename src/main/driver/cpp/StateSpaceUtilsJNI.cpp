@@ -50,43 +50,40 @@ JNIEXPORT void JNICALL
 Java_edu_wpi_first_wpilibj_math_StateSpaceUtilsJNI_exp
   (JNIEnv* env, jclass, jdoubleArray src, jint rows, jdoubleArray dst)
 {
+
+  jdouble* arrayBody = env->GetDoubleArrayElements(src, nullptr);
+
   Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
-                                   Eigen::RowMajor>> Amat{env->GetDoubleArrayElements(src, nullptr),
+                                   Eigen::RowMajor>> Amat{arrayBody,
                                    rows, rows};
   Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> Aexp = Amat.exp();
-  env->SetDoubleArrayRegion(dst, 0, rows * rows, Aexp.data());
 
-//  jboolean isCopy;
-//
-//  jdouble* Aelms = env->GetDoubleArrayElements(src, &isCopy);
-//
-//  Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
-//                                  Eigen::RowMajor>> Amat{Aelms,
-//                                  rows, rows};
-//
-//  Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> Aexp = Amat.exp();
-//  env->SetDoubleArrayRegion(dst, 0, rows * rows, Aexp.data());
-//
-//  if (isCopy == JNI_TRUE) {
-//      env -> ReleaseDoubleArrayElements(src, Aelms, JNI_ABORT);
-//  }
+  env->ReleaseDoubleArrayElements(src, arrayBody, 0);
+  env->SetDoubleArrayRegion(dst, 0, rows * rows, Aexp.data());
 }
 
 JNIEXPORT jboolean JNICALL
 Java_edu_wpi_first_wpilibj_math_StateSpaceUtilsJNI_isStabilizable
  (JNIEnv* env, jclass, jint states, jint inputs, jdoubleArray aSrc, jdoubleArray bSrc) {
 
+    jdouble* nativeA = env->GetDoubleArrayElements(aSrc, nullptr);
+    jdouble* nativeB = env->GetDoubleArrayElements(bSrc, nullptr);
+
     Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
-                                Eigen::RowMajor>> Amat{env->GetDoubleArrayElements(aSrc, nullptr),
+                                Eigen::RowMajor>> Amat{nativeA,
                                 states, states};
 
     Eigen::Map<Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic,
-                                Eigen::RowMajor>> Bmat{env->GetDoubleArrayElements(bSrc, nullptr),
+                                Eigen::RowMajor>> Bmat{nativeB,
                                 states, inputs};
 
+    bool isStabilizable = check_stabilizable(Amat, Bmat);
 
-    return check_stabilizable(Amat, Bmat);
-    //return true;// frc::IsStabilizable<>(Amat, Bmat);
+    env->ReleaseDoubleArrayElements(aSrc, nativeA, 0);
+    env->ReleaseDoubleArrayElements(bSrc, nativeB, 0);
+
+    return isStabilizable;
+
  }
 
 }  // extern "C"
