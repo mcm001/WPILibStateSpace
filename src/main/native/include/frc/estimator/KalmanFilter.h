@@ -65,7 +65,7 @@ class KalmanFilter {
 
     if (IsStabilizable<States, Outputs>(discA.transpose(),
                                         plant.C().transpose()) &&
-                                        Outputs <= States) {
+        Outputs <= States) {
       m_P = drake::math::DiscreteAlgebraicRiccatiEquation(
           discA.transpose(), plant.C().transpose(), discQ, m_discR);
     } else {
