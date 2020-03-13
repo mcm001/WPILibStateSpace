@@ -22,6 +22,7 @@ public class StateSpaceUtils {
      * <p>
      * Each element is squared and placed on the covariance matrix diagonal.
      *
+     * @param states  A Nat representing the states of the system.
      * @param stdDevs For a Q matrix, its elements are the standard deviations of
      *                each state from how the model behaves. For an R matrix, its
      *                elements are the standard deviations for each output
@@ -42,6 +43,7 @@ public class StateSpaceUtils {
      * Creates a vector of normally distributed white noise with the given noise
      * intensities for each element.
      *
+     * @param n       A Nat representing the dimensionality of  the noise vector to create.
      * @param stdDevs A matrix whose elements are the standard deviations of each
      *                element of the noise vector.
      * @return White noise vector.
@@ -62,8 +64,11 @@ public class StateSpaceUtils {
      * Returns a discretized version of the provided continuous process noise
      * covariance matrix.
      *
+     * @param <States>  A Num representing the number of states.
+     * @param states    A Nat representing the number of states.
      * @param Q         Continuous process noise covariance matrix.
      * @param dtSeconds Discretization timestep.
+     * @return the discretized process noise covariance matrix.
      */
     public static <States extends Num> Matrix<States, States> discretizeProcessNoiseCov(
             Nat<States> states, Matrix<States, States> A, Matrix<States, States> Q, double dtSeconds) {
@@ -95,6 +100,7 @@ public class StateSpaceUtils {
     /**
      * Discretizes the given continuous A matrix.
      *
+     * @param <States>  Num representing the number of states.
      * @param contA     Continuous system matrix.
      * @param dtSeconds Discretization timestep.
      * @return the discrete matrix system.
@@ -115,6 +121,7 @@ public class StateSpaceUtils {
      * using a taylor series to several terms and still be substantially cheaper
      * than taking the big exponential.
      *
+     * @param <States>  Nat representing the number of states.
      * @param contA     Continuous system matrix.
      * @param contQ     Continuous process noise covariance matrix.
      * @param dtSeconds Discretization timestep.
@@ -156,6 +163,7 @@ public class StateSpaceUtils {
      * Returns a discretized version of the provided continuous measurement noise
      * covariance matrix.
      *
+     * @param <Outputs> Nat representing the number of outputs.
      * @param R         Continuous measurement noise covariance matrix.
      * @param dtSeconds Discretization timestep.
      */
@@ -181,11 +189,12 @@ public class StateSpaceUtils {
      * The cost matrix is constructed using Bryson's rule. The inverse square of
      * each element in the input is taken and placed on the cost matrix diagonal.
      *
-     * @param states a Nat representing the number of States in the system.
-     * @param costs  An array. For a Q matrix, its elements are the maximum allowed
-     *               excursions of the states from the reference. For an R matrix,
-     *               its elements are the maximum allowed excursions of the control
-     *               inputs from no actuation.
+     * @param <States> Nat representing the states of the system.
+     * @param states   a Nat representing the number of States in the system.
+     * @param costs    An array. For a Q matrix, its elements are the maximum allowed
+     *                 excursions of the states from the reference. For an R matrix,
+     *                 its elements are the maximum allowed excursions of the control
+     *                 inputs from no actuation.
      * @return State excursion or control effort cost matrix.
      */
     public static <States extends Num> Matrix<States, States> makeCostMatrix(Nat<States> states, Matrix<States, N1> costs) {
@@ -202,12 +211,15 @@ public class StateSpaceUtils {
     /**
      * Discretizes the given continuous A and B matrices.
      *
+     * @param <States> Nat representing the states of the system.
+     * @param <Inputs> Nat representing the inputs to the system.
+     * @param states Num representing the states of the system.
+     * @param inputs Num representing the inputs to the system.
      * @param contA     Continuous system matrix.
      * @param contB     Continuous input matrix.
      * @param dtSeconds Discretization timestep.
      * @param discA     Storage for discrete system matrix.
      * @param discB     Storage for discrete input matrix.
-     *
      * @return a Pair representing discA and diskB.
      */
     public static <States extends Num, Inputs extends Num> Pair<Matrix<States, States>, Matrix<States, Inputs>>
@@ -266,6 +278,7 @@ public class StateSpaceUtils {
     /**
      * Decompose a given matrix by QR decomposition with the Householder QR decomposition algorithm.
      * This will throw a RuntimeException if src is not full rank.
+     *
      * @param src The matrix to decompose.
      * @return the decomposed matrix.
      */
@@ -382,7 +395,8 @@ public class StateSpaceUtils {
 
     /**
      * Computes the matrix exponential using Eigen's solver.
-     * @param A the matrix to exponentiate.
+     *
+     * @param A   the matrix to exponentiate.
      * @param <N> the size of the matrix A.
      * @return the exponential of A.
      */
@@ -396,6 +410,7 @@ public class StateSpaceUtils {
 
     /**
      * Computes the matrix exponential using Eigen's solver.
+     *
      * @param A the matrix to exponentiate.
      * @return the exponential of A.
      */
@@ -409,7 +424,7 @@ public class StateSpaceUtils {
 
     /**
      * Returns true if (A, B) is a stabilizable pair.
-     *
+     * <p>
      * (A,B) is stabilizable if and only if the uncontrollable eigenvalues of A, if
      * any, have absolute values less than one, where an eigenvalue is
      * uncontrollable if rank(lambda * I - A, B) %3C n where n is number of states.
@@ -426,7 +441,7 @@ public class StateSpaceUtils {
 
     /**
      * Returns true if (A, B) is a stabilizable pair.
-     *
+     * <p>
      * (A,B) is stabilizable if and only if the uncontrollable eigenvalues of A, if
      * any, have absolute values less than one, where an eigenvalue is
      * uncontrollable if rank(lambda * I - A, B) %3C n where n is number of states.

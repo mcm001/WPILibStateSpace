@@ -1,6 +1,7 @@
 {
     "java.configuration.updateBuildConfiguration": "automatic",
     "files.associations": {
-        "core": "cpp"
+        "core": "cpp",
+        "functional": "cpp"
     }
 }

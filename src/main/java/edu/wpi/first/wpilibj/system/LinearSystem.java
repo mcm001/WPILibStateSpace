@@ -5,7 +5,6 @@ import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpiutil.math.*;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N2;
-import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.simple.SimpleMatrix;
 
 public class LinearSystem<States extends Num, Inputs extends Num,
@@ -65,6 +64,17 @@ public class LinearSystem<States extends Num, Inputs extends Num,
      */
     private Matrix<Inputs, N1> m_delayedU;
 
+    /**
+     * @param states  A Nat representing the states of the system.
+     * @param inputs  A Nat representing the inputs to the system.
+     * @param outputs A Nat representing the outputs of the system.
+     * @param A       The system matrix A.
+     * @param B       The input matrix B.
+     * @param C       The output matrix C.
+     * @param D       The feedthrough matrix D.
+     * @param uMin    The minimum control input. Inputs with elements smaller than this will be clamped to the minimum input.
+     * @param uMax    The maximum control input. Inputs with elements smaller than this will be clamped to the maximum input.
+     */
     public LinearSystem(Nat<States> states, Nat<Inputs> inputs, Nat<Outputs> outputs,
                         Matrix<States, States> A, Matrix<States, Inputs> B,
                         Matrix<Outputs, States> C, Matrix<Outputs, Inputs> D,
@@ -88,6 +98,15 @@ public class LinearSystem<States extends Num, Inputs extends Num,
         reset();
     }
 
+    /**
+     * @param motor        The motor (or gearbox) attached to the arm.
+     * @param massKg       The mass of the elevator carriage, in kilograms.
+     * @param radiusMeters The radius of thd driving drum of the elevator, in meters.
+     * @param G            The reduction between motor and drum, as a ratio of output to input.
+     * @param maxVoltage   The max voltage that can be applied. Inputs greater than this will
+     *                     be clamped to it.
+     * @return A LinearSystem representing the given characterized constants.
+     */
     public static LinearSystem<N2, N1, N1> createElevatorSystem(DCMotor motor, double massKg, double radiusMeters, double G, double maxVoltage) {
         return new LinearSystem<>(Nat.N2(), Nat.N1(), Nat.N1(),
                 new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0, 1,
@@ -101,6 +120,14 @@ public class LinearSystem<States extends Num, Inputs extends Num,
                 new MatBuilder<>(Nat.N1(), Nat.N1()).fill(maxVoltage));
     }
 
+    /**
+     * @param motor            The motor (or gearbox) attached to the arm.
+     * @param jKgSquaredMeters The momoent of inertia J of the flywheel.
+     * @param G                The reduction between motor and drum, as a ratio of output to input.
+     * @param maxVoltage       The max voltage that can be applied. Inputs greater than this will
+     *                         be clamped to it.
+     * @return A LinearSystem representing the given characterized constants.
+     */
     public static LinearSystem<N1, N1, N1> createFlywheelSystem(DCMotor motor, double jKgSquaredMeters, double G, double maxVoltage) {
         return new LinearSystem<>(Nat.N1(), Nat.N1(), Nat.N1(),
                 new MatBuilder<>(Nat.N1(), Nat.N1()).fill(
@@ -113,6 +140,15 @@ public class LinearSystem<States extends Num, Inputs extends Num,
                 new MatBuilder<>(Nat.N1(), Nat.N1()).fill(maxVoltage));
     }
 
+    /**
+     * @param motor            The motor (or gearbox) attached to the arm.
+     * @param jKgSquaredMeters The momoent of inertia J of the arm.
+     * @param G                the gearing between the motor and arm, in output over input. Most of the time this
+     *                         will be greater than 1.
+     * @param maxVoltage       The max voltage that can be applied. Inputs greater than this will
+     *                         be clamped to it.
+     * @return A LinearSystem representing the given characterized constants.
+     */
     public static LinearSystem<N2, N1, N1> createSingleJointedArmSystem(DCMotor motor, double jKgSquaredMeters, double G, double maxVoltage) {
         return new LinearSystem<>(Nat.N2(), Nat.N1(), Nat.N1(),
                 new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0, 1,
@@ -129,6 +165,11 @@ public class LinearSystem<States extends Num, Inputs extends Num,
      * Identify a velocity system from it's kV (volts/(unit/sec)) and kA (volts/(unit/sec^2).
      * These constants cam be found using frc-characterization.
      *
+     * @param kV         The velocity gain, in volts per (units per second)
+     * @param kA         The acceleration gain, in volts per (units per second squared)
+     * @param maxVoltage The max voltage that can be applied. Inputs greater than this will
+     *                   be clamped to it.
+     * @return A LinearSystem representing the given characterized constants.
      * @see <a href="https://github.com/wpilibsuite/frc-characterization"> https://github.com/wpilibsuite/frc-characterization</a>
      */
     public static LinearSystem<N1, N1, N1> identifyVelocitySystem(double kV, double kA, double maxVoltage) {
@@ -145,6 +186,7 @@ public class LinearSystem<States extends Num, Inputs extends Num,
      * Identify a position system from it's kV (volts/(unit/sec)) and kA (volts/(unit/sec^2).
      * These constants cam be found using frc-characterization.
      *
+     * @return A LinearSystem representing the given characterized constants.
      * @see <a href="https://github.com/wpilibsuite/frc-characterization"> https://github.com/wpilibsuite/frc-characterization</a>
      */
     public static LinearSystem<N2, N1, N1> identifyPositionSystem(double kV, double kA, double maxVoltage) {
@@ -163,6 +205,11 @@ public class LinearSystem<States extends Num, Inputs extends Num,
      * angular (volts/(radian/sec) and volts/(radian/sec^2)) cases. This can be
      * found using frc-characterization.
      *
+     * @param kVLinear  The linear velocity gain, volts per (meter per second).
+     * @param kALinear  The linear acceleration gain, volts per (meter per second squared).
+     * @param kVAngular The angular velocity gain, volts per (radians per second).
+     * @param kAAngular The angular acceleration gain, volts per (radians per second squared).
+     * @return A LinearSystem representing the given characterized constants.
      * @see <a href="https://github.com/wpilibsuite/frc-characterization"> https://github.com/wpilibsuite/frc-characterization</a>
      */
     public static LinearSystem<N2, N2, N2> identifyDrivetrainSystem(
@@ -194,6 +241,8 @@ public class LinearSystem<States extends Num, Inputs extends Num,
 
     /**
      * Returns the system matrix A.
+     *
+     * @return the system matrix A.
      */
     public Matrix<States, States> getA() {
         return m_A;
@@ -204,6 +253,7 @@ public class LinearSystem<States extends Num, Inputs extends Num,
      *
      * @param i Row of A.
      * @param j Column of A.
+     * @return the system matrix A at (i, j).
      */
     public double getA(int i, int j) {
         return m_A.get(i, j);
@@ -211,6 +261,8 @@ public class LinearSystem<States extends Num, Inputs extends Num,
 
     /**
      * Returns the input matrix B.
+     *
+     * @return the input matrix B.
      */
     public Matrix<States, Inputs> getB() {
         return m_B;
@@ -221,6 +273,7 @@ public class LinearSystem<States extends Num, Inputs extends Num,
      *
      * @param i Row of B.
      * @param j Column of B.
+     * @return The value of the input matrix B at (i, j).
      */
     public double getB(int i, int j) {
         return m_B.get(i, j);
@@ -238,6 +291,7 @@ public class LinearSystem<States extends Num, Inputs extends Num,
      *
      * @param i Row of C.
      * @param j Column of C.
+     * @return the double value of C at the given position.
      */
     public double getC(int i, int j) {
         return m_C.get(i, j);
@@ -245,6 +299,8 @@ public class LinearSystem<States extends Num, Inputs extends Num,
 
     /**
      * Returns the feedthrough matrix D.
+     *
+     * @return the feedthrough matrix D.
      */
     public Matrix<Outputs, Inputs> getD() {
         return m_D;
@@ -255,6 +311,7 @@ public class LinearSystem<States extends Num, Inputs extends Num,
      *
      * @param i Row of D.
      * @param j Column of D.
+     * @return The feedthrough matrix D at (i, j).
      */
     public double getD(int i, int j) {
         return m_D.get(i, j);
@@ -262,6 +319,8 @@ public class LinearSystem<States extends Num, Inputs extends Num,
 
     /**
      * Returns the minimum control input vector u.
+     *
+     * @return The minimum control input vector u.
      */
     public Matrix<Inputs, N1> getUMin() {
         return m_uMin;
@@ -271,6 +330,7 @@ public class LinearSystem<States extends Num, Inputs extends Num,
      * Returns an element of the minimum control input vector u.
      *
      * @param i Row of u.
+     * @return The i-th element of the minimum control input vector u.
      */
     public double getUMin(int i) {
         return m_uMin.get(i, 1);
@@ -278,6 +338,8 @@ public class LinearSystem<States extends Num, Inputs extends Num,
 
     /**
      * Returns the maximum control input vector u.
+     *
+     * @return The maximum control input vector u.
      */
     public Matrix<Inputs, N1> getUMax() {
         return m_uMax;
@@ -287,6 +349,7 @@ public class LinearSystem<States extends Num, Inputs extends Num,
      * Returns an element of the maximum control input vector u.
      *
      * @param i Row of u.
+     * @return The i=th element of the maximum control input vector u.
      */
     public double getUMax(int i) {
         return m_uMax.get(i, 1);
@@ -294,6 +357,8 @@ public class LinearSystem<States extends Num, Inputs extends Num,
 
     /**
      * Returns the current state x.
+     *
+     * @return The current state x.
      */
     public Matrix<States, N1> getX() {
         return m_x;
@@ -312,6 +377,7 @@ public class LinearSystem<States extends Num, Inputs extends Num,
      * Returns an element of the current state x.
      *
      * @param i Row of x.
+     * @return The i-th element of the current state x.
      */
     public double getX(int i) {
         return m_x.get(i, 0);
@@ -319,6 +385,8 @@ public class LinearSystem<States extends Num, Inputs extends Num,
 
     /**
      * Returns the current measurement vector y.
+     *
+     * @return the current measurement vector y.
      */
     public Matrix<Outputs, N1> getY() {
         return m_y;
@@ -337,6 +405,7 @@ public class LinearSystem<States extends Num, Inputs extends Num,
      * Returns an element of the current measurement vector y.
      *
      * @param i Row of y.
+     * @return the output matrix Y at the given row i.
      */
     public double getY(int i) {
         return m_y.get(i, 0);
@@ -344,6 +413,8 @@ public class LinearSystem<States extends Num, Inputs extends Num,
 
     /**
      * Returns the control input vector u.
+     *
+     * @return the control input vector u.
      */
     public Matrix<Inputs, N1> getU() {
         return m_delayedU;
@@ -400,6 +471,7 @@ public class LinearSystem<States extends Num, Inputs extends Num,
      * @param x         The current state.
      * @param u         The control input.
      * @param dtSeconds Timestep for model update.
+     * @return the updated x.
      */
     public Matrix<States, N1> calculateX(Matrix<States, N1> x, Matrix<Inputs, N1> u, double dtSeconds) {
         Matrix<States, States> discA = new Matrix<>(new SimpleMatrix(states.getNum(), states.getNum()));
@@ -447,6 +519,7 @@ public class LinearSystem<States extends Num, Inputs extends Num,
      *
      * @param x The current state.
      * @param u The control input.
+     * @return the updated output matrix Y.
      */
     public Matrix<Outputs, N1> calculateY(
             Matrix<States, N1> x,

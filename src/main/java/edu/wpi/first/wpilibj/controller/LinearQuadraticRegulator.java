@@ -12,10 +12,10 @@ import org.ejml.simple.SimpleMatrix;
 
 /**
  * Contains the controller coefficients and logic for a state-space controller.
- *
+ * <p>
  * State-space controllers generally use the control law u = -Kx. The
  * feedforward used is u_ff = K_ff * (r_k+1 - A * r_k).
- *
+ * <p>
  * For more on the underlying math, read
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
  */
@@ -47,6 +47,8 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num,
     /**
      * Constructs a controller with the given coefficients and plant.
      *
+     * @param states    a Nat representing the number of states.
+     * @param inputs    a Nat representing the number of inputs.
      * @param plant     The plant being controlled.
      * @param qElms     The maximum desired error tolerance for each state.
      * @param rElms     The maximum desired control effort for each input.
@@ -65,6 +67,8 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num,
     /**
      * Constructs a controller with the given coefficients and plant.
      *
+     * @param states    a Nat representing the number of states.
+     * @param inputs    a Nat representing the number of inputs.
      * @param a         Continuous system matrix of the plant being controlled.
      * @param b         Continuous input matrix of the plant being controlled.
      * @param qElems    The maximum desired error tolerance for each state.
@@ -121,9 +125,11 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num,
     /**
      * Constructs a controller with the given coefficients and plant.
      *
+     * @param states    a Nat representing the number of states.
+     * @param inputs    a Nat representing the number of inputs.
      * @param a         Continuous system matrix of the plant being controlled.
      * @param b         Continuous input matrix of the plant being controlled.
-     * @param k the controller matrix K to use.
+     * @param k         the controller matrix K to use.
      * @param dtSeconds Discretization timestep.
      */
     public LinearQuadraticRegulator(
@@ -192,6 +198,8 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num,
 
     /**
      * Returns the controller matrix K.
+     *
+     * @return the controller matrix K.
      */
     public Matrix<Inputs, States> getK() {
         return m_K;

@@ -33,6 +33,9 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
     /**
      * Constructs an extended Kalman filter.
      *
+     * @param states             a Nat representing the number of states.
+     * @param inputs             a Nat representing the number of inputs.
+     * @param outputs            a Nat representing the number of outputs.
      * @param f                  A vector-valued function of x and u that returns
      *                           the derivative of the state vector.
      * @param h                  A vector-valued function of x and u that returns
@@ -87,6 +90,8 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
 
     /**
      * Returns the error covariance matrix P.
+     *
+     * @return the error covariance matrix P.
      */
     public Matrix<States, States> getP() {
         return m_P;
@@ -106,6 +111,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
      *
      * @param i Row of P.
      * @param j Column of P.
+     * @return the value of the error covariance matrix P at (i, j).
      */
     public double getP(int i, int j) {
         return m_P.get(i, j);
@@ -113,6 +119,8 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
 
     /**
      * Returns the state estimate x-hat.
+     *
+     * @return the state estimate x-hat.
      */
     public Matrix<States, N1> getXhat() {
         return m_xHat;
@@ -131,6 +139,7 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
      * Returns an element of the state estimate x-hat.
      *
      * @param i Row of x-hat.
+     * @return the value of the state estimate x-hat at i.
      */
     public double getXhat(int i) {
         return m_xHat.get(i, 0);
@@ -161,6 +170,13 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
         predict(u, m_f, dtSeconds);
     }
 
+    /**
+     * Project the model into the future with a new control input u.
+     *
+     * @param u         New control input from controller.
+     * @param f         The function used to linearlize the model.
+     * @param dtSeconds Timestep for prediction.
+     */
     public void predict(
             Matrix<Inputs, N1> u, BiFunction<Matrix<States, N1>,
             Matrix<Inputs, N1>, Matrix<States, N1>> f,
@@ -200,11 +216,12 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
      * Correct() call vary. The h(x, u) passed to the constructor is used if one is
      * not provided (the two-argument version of this function).
      *
-     * @param u Same control input used in the predict step.
-     * @param y Measurement vector.
-     * @param h A vector-valued function of x and u that returns the measurement
-     *          vector.
-     * @param R Discrete measurement noise covariance matrix.
+     * @param rows Number of rows in the result of f(x, u).
+     * @param u    Same control input used in the predict step.
+     * @param y    Measurement vector.
+     * @param h    A vector-valued function of x and u that returns the measurement
+     *             vector.
+     * @param R    Discrete measurement noise covariance matrix.
      */
     public <Rows extends Num> void correct(
             Nat<Rows> rows, Matrix<Inputs, N1> u,

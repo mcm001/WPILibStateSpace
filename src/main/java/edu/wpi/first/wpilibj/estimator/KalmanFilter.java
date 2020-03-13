@@ -13,18 +13,18 @@ import org.ejml.simple.SimpleMatrix;
 /**
  * Luenberger observers combine predictions from a model and measurements to
  * give an estimate of the true system state.
- *
+ * <p>
  * Luenberger observers use an L gain matrix to determine whether to trust the
  * model or measurements more. Kalman filter theory uses statistics to compute
  * an optimal L gain (alternatively called the Kalman gain, K) which minimizes
  * the sum of squares error in the state estimate.
- *
+ * <p>
  * Luenberger observers run the prediction and correction steps simultaneously
  * while Kalman filters run them sequentially. To implement a discrete-time
  * Kalman filter as a Luenberger observer, use the following mapping:
  * <pre>C = H, L = A * K</pre>
  * (H is the measurement matrix).
- *
+ * <p>
  * For more on the underlying math, read
  * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
  */
@@ -73,16 +73,17 @@ public class KalmanFilter<States extends Num, Inputs extends Num,
      */
     private Matrix<Outputs, Outputs> m_discR;
 
-      /**
-   * Constructs a state-space observer with the given plant.
-   *
-   * @param states             A Nat representing the states of the system.
-   * @param inputs             A Nat representing the inputs to the system.
-   * @param plant              The plant used for the prediction step.
-   * @param stateStdDevs       Standard deviations of model states.
-   * @param measurementStdDevs Standard deviations of measurements.
-   * @param dtSeconds                 Nominal discretization timestep.
-   */
+    /**
+     * Constructs a state-space observer with the given plant.
+     *
+     * @param states             A Nat representing the states of the system.
+     * @param inputs             A Nat representing the inputs to the system.
+     * @param outputs            A Nat representing the outputs of the system.
+     * @param plant              The plant used for the prediction step.
+     * @param stateStdDevs       Standard deviations of model states.
+     * @param measurementStdDevs Standard deviations of measurements.
+     * @param dtSeconds          Nominal discretization timestep.
+     */
     public KalmanFilter(
             Nat<States> states, Nat<Inputs> inputs, Nat<Outputs> outputs,
             LinearSystem<States, Inputs, Outputs> plant,
@@ -117,6 +118,8 @@ public class KalmanFilter<States extends Num, Inputs extends Num,
 
     /**
      * Returns the error covariance matrix P.
+     *
+     * @return the error covariance matrix P.
      */
     public Matrix<States, States> getP() {
         return m_P;
@@ -127,6 +130,7 @@ public class KalmanFilter<States extends Num, Inputs extends Num,
      *
      * @param i Row of P.
      * @param j Column of P.
+     * @return the element (i, j) of the error covariance matrix P.
      */
     public double getP(int i, int j) {
         return m_P.get(i, j);
@@ -135,6 +139,8 @@ public class KalmanFilter<States extends Num, Inputs extends Num,
 
     /**
      * Returns the state estimate x-hat.
+     *
+     * @return the state estimate x-hat.
      */
     public Matrix<States, N1> getXhat() {
         return m_plant.getX();
@@ -153,6 +159,7 @@ public class KalmanFilter<States extends Num, Inputs extends Num,
      * Returns an element of the state estimate x-hat.
      *
      * @param i Row of x-hat.
+     * @return the state estimate x-hat at i.
      */
     public double getXhat(int i) {
         return m_plant.getX(i);
@@ -209,10 +216,11 @@ public class KalmanFilter<States extends Num, Inputs extends Num,
      * Correct() call vary. The C matrix passed to the constructor is used if one
      * is not provided (the two-argument version of this function).
      *
-     * @param u Same control input used in the predict step.
-     * @param y Measurement vector.
-     * @param C Output matrix.
-     * @param R Measurement noise covariance matrix.
+     * @param <Rows> Number of rows in the result of f(x, u).
+     * @param u      Same control input used in the predict step.
+     * @param y      Measurement vector.
+     * @param C      Output matrix.
+     * @param R      Measurement noise covariance matrix.
      */
     public <Rows extends Num> void correct(
             Matrix<Inputs, N1> u,

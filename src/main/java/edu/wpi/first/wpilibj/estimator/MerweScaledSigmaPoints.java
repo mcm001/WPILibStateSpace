@@ -52,6 +52,8 @@ public class MerweScaledSigmaPoints<States extends Num> {
 
     /**
      * Returns number of sigma points for each variable in the state x.
+     *
+     * @return The number of sigma points for each variable in the state x.
      */
     public int getNumSigns() {
         return 2 * m_states.getNum() + 1;
@@ -115,6 +117,8 @@ public class MerweScaledSigmaPoints<States extends Num> {
 
     /**
      * Returns the weight for each sigma point for the mean.
+     *
+     * @return the weight for each sigma point for the mean.
      */
     public Matrix getWm() {
         return m_Wm;
@@ -124,6 +128,7 @@ public class MerweScaledSigmaPoints<States extends Num> {
      * Returns an element of the weight for each sigma point for the mean.
      *
      * @param i Element of vector to return.
+     * @return the element i's weight for the mean.
      */
     public double getWm(int i) {
         return m_Wm.get(0, i);
@@ -131,6 +136,8 @@ public class MerweScaledSigmaPoints<States extends Num> {
 
     /**
      * Returns the weight for each sigma point for the covariance.
+     *
+     * @return the weight for each sigma point for the covariance.
      */
     public Matrix getWc() {
         return m_Wc;
@@ -140,6 +147,7 @@ public class MerweScaledSigmaPoints<States extends Num> {
      * Returns an element of the weight for each sigma point for the covariance.
      *
      * @param i Element of vector to return.
+     * @return The element I's weight for the covariance.
      */
     public double getWc(int i) {
         return m_Wc.get(0, i);

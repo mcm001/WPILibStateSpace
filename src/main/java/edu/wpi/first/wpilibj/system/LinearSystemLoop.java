@@ -59,6 +59,8 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
 
     /**
      * Returns the observer's state estimate x-hat.
+     *
+     * @return the observer's state estimate x-hat.
      */
     public Matrix<States, N1> getXHat() {
         return m_observer.getXhat();
@@ -77,6 +79,7 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
      * Returns an element of the observer's state estimate x-hat.
      *
      * @param i Row of x-hat.
+     * @return the i-th element of the observer's state estimate x-hat.
      */
     public double getXHat(int i) {
         return m_observer.getXhat(i);
@@ -84,6 +87,8 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
 
     /**
      * Returns the controller's next reference r.
+     *
+     * @return the controller's next reference r.
      */
     public Matrix<States, N1> getNextR() {
         return m_nextR;
@@ -102,6 +107,7 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
      * Returns an element of the controller's next reference r.
      *
      * @param i Row of r.
+     * @return the element i of the controller's next reference r.
      */
     public double getNextR(int i) {
         return m_nextR.get(i, 0);
@@ -109,6 +115,8 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
 
     /**
      * Returns the controller's calculated control input u.
+     *
+     * @return the calculated control input u.
      */
     public Matrix<Inputs, N1> getU() {
         return m_plant.clampInput(m_controller.getU());
@@ -118,6 +126,7 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
      * Returns an element of the controller's calculated control input u.
      *
      * @param i Row of u.
+     * @return the calculated control input u at the row i.
      */
     public double getU(int i) {
         return getU().get(i, 0);
@@ -135,6 +144,8 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
 
     /**
      * Return the plant used internally.
+     *
+     * @return the plant used internally.
      */
     public LinearSystem<States, Inputs, Outputs> getPlant() {
         return m_plant;
@@ -142,6 +153,8 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
 
     /**
      * Return the controller used internally.
+     *
+     * @return the controller used internally.
      */
     public LinearQuadraticRegulator<States, Inputs, Outputs> getController() {
         return m_controller;
@@ -149,6 +162,8 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
 
     /**
      * Return the observer used internally.
+     *
+     * @return the observer used internally.
      */
     public KalmanFilter<States, Inputs, Outputs> getObserver() {
         return m_observer;
@@ -167,6 +182,8 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
 
     /**
      * Returns difference between reference r and x-hat.
+     *
+     * @return the
      */
     public Matrix<States, N1> getError() {
         return m_controller.getR().minus(m_observer.getXhat());
@@ -174,6 +191,9 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
 
     /**
      * Returns difference between reference r and x-hat.
+     *
+     * @param index The index of the error matrix to return.
+     * @return The error at that index.
      */
     public double getError(int index) {
         return (m_controller.getR().minus(m_observer.getXhat())).get(index, 0);
@@ -201,25 +221,4 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
         m_controller.update(m_observer.getXhat(), m_nextR);
         m_observer.predict(m_controller.getU(), dtSeconds);
     }
-
-    /**
-     * Returns the current controller index.
-     */
-    public int getIndex() {
-//        return m_plant.getIndex(); // TODO get impl from Tyler
-        return 0;
-    }
-
-    /**
-     * Sets the current controller to be "index". This can be used for gain
-     * scheduling.
-     *
-     * @param index The controller index.
-     */
-    public void setIndex(int index) {
-//        m_plant.setIndex(index); // TODO get impl from Tyler
-//        m_controller.setIndex(index);
-//        m_observer.setIndex(index);
-    }
-
 }

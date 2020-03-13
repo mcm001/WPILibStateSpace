@@ -31,6 +31,8 @@ public final class DrakeJNI {
 
     /**
      * Force load the library.
+     *
+     * @throws IOException If the library could not be loaded or found.
      */
     public static synchronized void forceLoad() throws IOException {
         if (libraryLoaded) {

@@ -16,7 +16,7 @@ public class RungeKuttaHelper {
      * @param f         The function to integrate, which takes one argument x.
      * @param x         The initial value of x.
      * @param dtSeconds The time over which to integrate.
-     * @return
+     * @return the integration of dx/dt = f(x) for dt.
      */
     public static double rungeKutta(
             DoubleFunction<Double> f,
@@ -38,6 +38,7 @@ public class RungeKuttaHelper {
      * @param x         The initial value of x.
      * @param u         The value u held constant over the integration period.
      * @param dtSeconds The time over which to integrate.
+     * @return The result of Runge Kutta integration (4th order).
      */
     public static double rungeKutta(
             BiFunction<Double, Double, Double> f,
@@ -54,10 +55,13 @@ public class RungeKuttaHelper {
     /**
      * Performs 4th order Runge-Kutta integration of dx/dt = f(x, u) for dt.
      *
+     * @param <States>  A Num representing the states of the system to integrate.
+     * @param <Inputs>  A Num representing the inputs of the system to integrate.
      * @param f         The function to integrate. It must take two arguments x and u.
      * @param x         The initial value of x.
      * @param u         The value u held constant over the integration period.
      * @param dtSeconds The time over which to integrate.
+     * @return the integration of dx/dt = f(x, u) for dt.
      */
     public static <States extends Num, Inputs extends Num> Matrix<States, N1> rungeKutta(
             BiFunction<Matrix<States, N1>, Matrix<Inputs, N1>, Matrix<States, N1>> f,
@@ -74,9 +78,11 @@ public class RungeKuttaHelper {
     /**
      * Performs 4th order Runge-Kutta integration of dx/dt = f(x) for dt.
      *
+     * @param <States>  A Num prepresenting the states of the system.
      * @param f         The function to integrate. It must take one argument x.
      * @param x         The initial value of x.
      * @param dtSeconds The time over which to integrate.
+     * @return 4th order Runge-Kutta integration of dx/dt = f(x) for dt.
      */
     public static <States extends Num> Matrix<States, N1> rungeKutta(
             Function<Matrix<States, N1>, Matrix<States, N1>> f,
