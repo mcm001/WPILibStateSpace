@@ -175,7 +175,19 @@ public class StateSpaceUtils {
         return R.div(dtSeconds);
     }
 
-
+    /**
+     * Creates a cost matrix from the given vector for use with LQR.
+     * <p>
+     * The cost matrix is constructed using Bryson's rule. The inverse square of
+     * each element in the input is taken and placed on the cost matrix diagonal.
+     *
+     * @param states a Nat representing the number of States in the system.
+     * @param costs  An array. For a Q matrix, its elements are the maximum allowed
+     *               excursions of the states from the reference. For an R matrix,
+     *               its elements are the maximum allowed excursions of the control
+     *               inputs from no actuation.
+     * @return State excursion or control effort cost matrix.
+     */
     public static <States extends Num> Matrix<States, States> makeCostMatrix(Nat<States> states, Matrix<States, N1> costs) {
         var result = new SimpleMatrix(states.getNum(), states.getNum());
         result.fill(0.0);
@@ -187,36 +199,48 @@ public class StateSpaceUtils {
         return new Matrix<>(result);
     }
 
-    public static <States extends Num, Inputs extends Num> void discretizeAB(Nat<States> states, Nat<Inputs> inputs,
-                                                                             Matrix<States, States> a, Matrix<States, Inputs> b,
-                                                                             double dtSeconds, Matrix<States, States> discA,
-                                                                             Matrix<States, Inputs> discB) {
+    /**
+     * Discretizes the given continuous A and B matrices.
+     *
+     * @param contA     Continuous system matrix.
+     * @param contB     Continuous input matrix.
+     * @param dtSeconds Discretization timestep.
+     * @param discA     Storage for discrete system matrix.
+     * @param discB     Storage for discrete input matrix.
+     *
+     * @return a Pair representing discA and diskB.
+     */
+    public static <States extends Num, Inputs extends Num> Pair<Matrix<States, States>, Matrix<States, Inputs>>
+    discretizeAB(Nat<States> states, Nat<Inputs> inputs,
+                 Matrix<States, States> contA,
+                 Matrix<States, Inputs> contB,
+                 double dtSeconds,
+                 Matrix<States, States> discA,
+                 Matrix<States, Inputs> discB) {
 
-        SimpleMatrix Mcont = new SimpleMatrix(states.getNum() + inputs.getNum(), states.getNum() + inputs.getNum());
-        var scaledA = a.times(dtSeconds).getStorage();
-        var scaledB = b.times(dtSeconds).getStorage();
+        SimpleMatrix Mcont = new SimpleMatrix(0, 0);
+        var scaledA = contA.times(dtSeconds);
+        var scaledB = contB.times(dtSeconds);
+        Mcont = Mcont.concatColumns(scaledA.getStorage());
+        Mcont = Mcont.concatColumns(scaledB.getStorage());
+        // so our Mcont is now states x (states + inputs)
+        // and we want (states + inputs) x (states + inputs)
+        // so we want to add (inputs) many rows onto the bottom
+        Mcont = Mcont.concatRows(new SimpleMatrix(inputs.getNum(), states.getNum() + inputs.getNum()));
 
-        // i is row
-        for (int i = 0; i < states.getNum(); i++) {
-            for (int j = 0; j < states.getNum(); j++) {
-                Mcont.set(i, j, scaledA.get(i, j));
-            }
-            for (int j = 0; j < inputs.getNum(); j++) {
-                Mcont.set(i, j + states.getNum(), scaledA.get(i, j));
-            }
-        }
+//        System.out.println(Mcont);
 
         // Discretize A and B with the given timestep
-        var Mdisc = StateSpaceUtils.scipyExpm(Mcont);
+        var Mdisc = StateSpaceUtils.scipyExpm(Mcont); // TODO should we use the Eigen exp algorithm?
 
-        var discA_ = new SimpleMatrix(states.getNum(), states.getNum());
-        var discB_ = new SimpleMatrix(states.getNum(), inputs.getNum());
-        CommonOps_DDRM.extract(Mdisc.getDDRM(), 0, 0, discA_.getDDRM());
-        CommonOps_DDRM.extract(Mdisc.getDDRM(), 0, states.getNum(), discB_.getDDRM());
+//        System.out.printf("Mdisc: \n%s", Mdisc);
 
-        discA = new Matrix<>(discA_);
-        discB = new Matrix<>(discB_);
+//        discA.getStorage().set(Mdisc.extractMatrix(0, 0, states.getNum(), states.getNum()));
+//        discB.getStorage().set(Mdisc.extractMatrix(0, states.getNum(), states.getNum(), inputs.getNum()));
+        CommonOps_DDRM.extract(Mdisc.getDDRM(), 0, 0, discA.getStorage().getDDRM());
+        CommonOps_DDRM.extract(Mdisc.getDDRM(), 0, states.getNum(), discB.getStorage().getDDRM());
 
+        return new Pair<>(discA, discB);
     }
 
     /**
@@ -239,6 +263,12 @@ public class StateSpaceUtils {
         return SimpleMatrix.wrap(chol.getT(null));
     }
 
+    /**
+     * Decompose a given matrix by QR decomposition with the Householder QR decomposition algorithm.
+     * This will throw a RuntimeException if src is not full rank.
+     * @param src The matrix to decompose.
+     * @return the decomposed matrix.
+     */
     public static SimpleMatrix householderQrDecompose(SimpleMatrix src) {
         var temp = src.copy();
 
@@ -350,6 +380,12 @@ public class StateSpaceUtils {
 
     }
 
+    /**
+     * Computes the matrix exponential using Eigen's solver.
+     * @param A the matrix to exponentiate.
+     * @param <N> the size of the matrix A.
+     * @return the exponential of A.
+     */
     public static <N extends Num> Matrix<N, N> exp(
             Matrix<N, N> A
     ) {
@@ -358,6 +394,11 @@ public class StateSpaceUtils {
         return toReturn;
     }
 
+    /**
+     * Computes the matrix exponential using Eigen's solver.
+     * @param A the matrix to exponentiate.
+     * @return the exponential of A.
+     */
     public static SimpleMatrix exp(
             SimpleMatrix A
     ) {
@@ -366,6 +407,16 @@ public class StateSpaceUtils {
         return toReturn;
     }
 
+    /**
+     * Returns true if (A, B) is a stabilizable pair.
+     *
+     * (A,B) is stabilizable if and only if the uncontrollable eigenvalues of A, if
+     * any, have absolute values less than one, where an eigenvalue is
+     * uncontrollable if rank(lambda * I - A, B) %3C n where n is number of states.
+     *
+     * @param A System matrix.
+     * @param B Input matrix.
+     */
     public static <S extends Num, I extends Num> boolean isStabilizable(
             Matrix<S, S> A, Matrix<S, I> B
     ) {
@@ -373,6 +424,15 @@ public class StateSpaceUtils {
                 A.getStorage().getDDRM().getData(), B.getStorage().getDDRM().getData());
     }
 
+    /**
+     * Returns true if (A, B) is a stabilizable pair.
+     *
+     * (A,B) is stabilizable if and only if the uncontrollable eigenvalues of A, if
+     * any, have absolute values less than one, where an eigenvalue is
+     * uncontrollable if rank(lambda * I - A, B) %3C n where n is number of states.
+     *
+     * @param A System matrix.
+     */
     public static SimpleMatrix isStabilizable(
             SimpleMatrix A
     ) {

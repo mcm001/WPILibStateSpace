@@ -27,7 +27,7 @@ namespace frc {
  * feedforward used is u_ff = K_ff * (r_k+1 - A * r_k).
  *
  * For more on the underlying math, read
- * https://file.tavsys.net/control/state-space-guide.pdf.
+ * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
  */
 template <int States, int Inputs>
 class LinearQuadraticRegulator {

@@ -405,39 +405,39 @@ public class LinearSystem<States extends Num, Inputs extends Num,
         Matrix<States, States> discA = new Matrix<>(new SimpleMatrix(states.getNum(), states.getNum()));
         Matrix<States, Inputs> discB = new Matrix<>(new SimpleMatrix(states.getNum(), inputs.getNum()));
 
-        discretizeAB(m_A, m_B, dtSeconds, discA, discB);
+        StateSpaceUtils.discretizeAB(states, inputs, m_A, m_B, dtSeconds, discA, discB);
 
         return (discA.times(x)).plus(discB.times(clampInput(u)));
     }
 
-    private void discretizeAB(Matrix<States, States> contA,
-                              Matrix<States, Inputs> contB,
-                              double dtSeconds,
-                              Matrix<States, States> discA,
-                              Matrix<States, Inputs> discB) {
-
-        SimpleMatrix Mcont = new SimpleMatrix(0, 0);
-        var scaledA = contA.times(dtSeconds);
-        var scaledB = contB.times(dtSeconds);
-        Mcont = Mcont.concatColumns(scaledA.getStorage());
-        Mcont = Mcont.concatColumns(scaledB.getStorage());
-        // so our Mcont is now states x (states + inputs)
-        // and we want (states + inputs) x (states + inputs)
-        // so we want to add (inputs) many rows onto the bottom
-        Mcont = Mcont.concatRows(new SimpleMatrix(inputs.getNum(), states.getNum() + inputs.getNum()));
-
-//        System.out.println(Mcont);
-
-        // Discretize A and B with the given timestep
-        var Mdisc = StateSpaceUtils.scipyExpm(Mcont);
-
-//        System.out.printf("Mdisc: \n%s", Mdisc);
-
-//        discA.getStorage().set(Mdisc.extractMatrix(0, 0, states.getNum(), states.getNum()));
-//        discB.getStorage().set(Mdisc.extractMatrix(0, states.getNum(), states.getNum(), inputs.getNum()));
-        CommonOps_DDRM.extract(Mdisc.getDDRM(), 0, 0, discA.getStorage().getDDRM());
-        CommonOps_DDRM.extract(Mdisc.getDDRM(), 0, states.getNum(), discB.getStorage().getDDRM());
-    }
+//    private void discretizeAB(Matrix<States, States> contA,
+//                              Matrix<States, Inputs> contB,
+//                              double dtSeconds,
+//                              Matrix<States, States> discA,
+//                              Matrix<States, Inputs> discB) {
+//
+//        SimpleMatrix Mcont = new SimpleMatrix(0, 0);
+//        var scaledA = contA.times(dtSeconds);
+//        var scaledB = contB.times(dtSeconds);
+//        Mcont = Mcont.concatColumns(scaledA.getStorage());
+//        Mcont = Mcont.concatColumns(scaledB.getStorage());
+//        // so our Mcont is now states x (states + inputs)
+//        // and we want (states + inputs) x (states + inputs)
+//        // so we want to add (inputs) many rows onto the bottom
+//        Mcont = Mcont.concatRows(new SimpleMatrix(inputs.getNum(), states.getNum() + inputs.getNum()));
+//
+////        System.out.println(Mcont);
+//
+//        // Discretize A and B with the given timestep
+//        var Mdisc = StateSpaceUtils.scipyExpm(Mcont);
+//
+////        System.out.printf("Mdisc: \n%s", Mdisc);
+//
+////        discA.getStorage().set(Mdisc.extractMatrix(0, 0, states.getNum(), states.getNum()));
+////        discB.getStorage().set(Mdisc.extractMatrix(0, states.getNum(), states.getNum(), inputs.getNum()));
+//        CommonOps_DDRM.extract(Mdisc.getDDRM(), 0, 0, discA.getStorage().getDDRM());
+//        CommonOps_DDRM.extract(Mdisc.getDDRM(), 0, states.getNum(), discB.getStorage().getDDRM());
+//    }
 
     /**
      * Computes the new y given the control input.

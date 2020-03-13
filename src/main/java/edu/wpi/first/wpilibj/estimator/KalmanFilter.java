@@ -10,6 +10,24 @@ import edu.wpi.first.wpiutil.math.Num;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import org.ejml.simple.SimpleMatrix;
 
+/**
+ * Luenberger observers combine predictions from a model and measurements to
+ * give an estimate of the true system state.
+ *
+ * Luenberger observers use an L gain matrix to determine whether to trust the
+ * model or measurements more. Kalman filter theory uses statistics to compute
+ * an optimal L gain (alternatively called the Kalman gain, K) which minimizes
+ * the sum of squares error in the state estimate.
+ *
+ * Luenberger observers run the prediction and correction steps simultaneously
+ * while Kalman filters run them sequentially. To implement a discrete-time
+ * Kalman filter as a Luenberger observer, use the following mapping:
+ * <pre>C = H, L = A * K</pre>
+ * (H is the measurement matrix).
+ *
+ * For more on the underlying math, read
+ * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
+ */
 public class KalmanFilter<States extends Num, Inputs extends Num,
         Outputs extends Num> {
 
@@ -55,6 +73,16 @@ public class KalmanFilter<States extends Num, Inputs extends Num,
      */
     private Matrix<Outputs, Outputs> m_discR;
 
+      /**
+   * Constructs a state-space observer with the given plant.
+   *
+   * @param states             A Nat representing the states of the system.
+   * @param inputs             A Nat representing the inputs to the system.
+   * @param plant              The plant used for the prediction step.
+   * @param stateStdDevs       Standard deviations of model states.
+   * @param measurementStdDevs Standard deviations of measurements.
+   * @param dtSeconds                 Nominal discretization timestep.
+   */
     public KalmanFilter(
             Nat<States> states, Nat<Inputs> inputs, Nat<Outputs> outputs,
             LinearSystem<States, Inputs, Outputs> plant,

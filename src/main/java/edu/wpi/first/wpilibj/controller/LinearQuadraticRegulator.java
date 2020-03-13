@@ -10,6 +10,15 @@ import edu.wpi.first.wpiutil.math.numbers.N1;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.simple.SimpleMatrix;
 
+/**
+ * Contains the controller coefficients and logic for a state-space controller.
+ *
+ * State-space controllers generally use the control law u = -Kx. The
+ * feedforward used is u_ff = K_ff * (r_k+1 - A * r_k).
+ *
+ * For more on the underlying math, read
+ * https://file.tavsys.net/control/controls-engineering-in-frc.pdf.
+ */
 public class LinearQuadraticRegulator<States extends Num, Inputs extends Num,
         Outputs extends Num> {
 
@@ -104,6 +113,51 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num,
 //            StateSpaceUtils.lltDecompose(temp).solve(discB.transpose().mult(S).mult(discA)));
 
         m_K = new Matrix<>((discB.transpose().mult(S).mult(discB).plus(R.getStorage())).invert().mult(discB.transpose()).mult(S).mult(discA)); // TODO (HIGH) SWITCH ALGORITHMS
+
+        this.m_r = new Matrix<>(new SimpleMatrix(states.getNum(), 1));
+        this.m_u = new Matrix<>(new SimpleMatrix(inputs.getNum(), 1));
+    }
+
+    /**
+     * Constructs a controller with the given coefficients and plant.
+     *
+     * @param a         Continuous system matrix of the plant being controlled.
+     * @param b         Continuous input matrix of the plant being controlled.
+     * @param k the controller matrix K to use.
+     * @param dtSeconds Discretization timestep.
+     */
+    public LinearQuadraticRegulator(
+            Nat<States> states, Nat<Inputs> inputs,
+            Matrix<States, States> a, Matrix<States, Inputs> b,
+            Matrix<Inputs, States> k,
+            double dtSeconds
+    ) {
+        this.m_A = a;
+        this.m_B = b;
+
+        var size = states.getNum() + inputs.getNum();
+        var Mcont = new SimpleMatrix(0, 0);
+        var scaledA = m_A.times(dtSeconds);
+        var scaledB = m_B.times(dtSeconds);
+        Mcont = Mcont.concatColumns(scaledA.getStorage());
+        Mcont = Mcont.concatColumns(scaledB.getStorage());
+        // so our Mcont is now states x (states + inputs)
+        // and we want (states + inputs) x (states + inputs)
+        // so we want to add (inputs) many rows onto the bottom
+        Mcont = Mcont.concatRows(new SimpleMatrix(inputs.getNum(), size));
+
+        // calculate discrete A and B matrices
+        SimpleMatrix Mstate = StateSpaceUtils.exp(Mcont);
+
+        var discA = new SimpleMatrix(states.getNum(), states.getNum());
+        var discB = new SimpleMatrix(states.getNum(), inputs.getNum());
+        CommonOps_DDRM.extract(Mstate.getDDRM(), 0, 0, discA.getDDRM());
+        CommonOps_DDRM.extract(Mstate.getDDRM(), 0, states.getNum(), discB.getDDRM());
+
+        this.m_discB = new Matrix<>(discB);
+        this.m_discA = new Matrix<>(discA);
+
+        m_K = k;
 
         this.m_r = new Matrix<>(new SimpleMatrix(states.getNum(), 1));
         this.m_u = new Matrix<>(new SimpleMatrix(inputs.getNum(), 1));
