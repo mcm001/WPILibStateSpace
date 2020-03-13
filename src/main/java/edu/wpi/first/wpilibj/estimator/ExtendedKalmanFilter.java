@@ -216,12 +216,13 @@ public class ExtendedKalmanFilter<States extends Num, Inputs extends Num, Output
      * Correct() call vary. The h(x, u) passed to the constructor is used if one is
      * not provided (the two-argument version of this function).
      *
-     * @param rows Number of rows in the result of f(x, u).
-     * @param u    Same control input used in the predict step.
-     * @param y    Measurement vector.
-     * @param h    A vector-valued function of x and u that returns the measurement
-     *             vector.
-     * @param R    Discrete measurement noise covariance matrix.
+     * @param <Rows> Number of rows in the result of f(x, u).
+     * @param rows   Number of rows in the result of f(x, u).
+     * @param u      Same control input used in the predict step.
+     * @param y      Measurement vector.
+     * @param h      A vector-valued function of x and u that returns the measurement
+     *               vector.
+     * @param R      Discrete measurement noise covariance matrix.
      */
     public <Rows extends Num> void correct(
             Nat<Rows> rows, Matrix<Inputs, N1> u,

@@ -186,6 +186,9 @@ public class LinearSystem<States extends Num, Inputs extends Num,
      * Identify a position system from it's kV (volts/(unit/sec)) and kA (volts/(unit/sec^2).
      * These constants cam be found using frc-characterization.
      *
+     * @param kV         The velocity gain, in volts per (units per second)
+     * @param kA         The acceleration gain, in volts per (units per second squared)
+     * @param maxVoltage The max voltage that can be applied. Control inputs above this will be clamped to it.
      * @return A LinearSystem representing the given characterized constants.
      * @see <a href="https://github.com/wpilibsuite/frc-characterization"> https://github.com/wpilibsuite/frc-characterization</a>
      */
@@ -205,10 +208,11 @@ public class LinearSystem<States extends Num, Inputs extends Num,
      * angular (volts/(radian/sec) and volts/(radian/sec^2)) cases. This can be
      * found using frc-characterization.
      *
-     * @param kVLinear  The linear velocity gain, volts per (meter per second).
-     * @param kALinear  The linear acceleration gain, volts per (meter per second squared).
-     * @param kVAngular The angular velocity gain, volts per (radians per second).
-     * @param kAAngular The angular acceleration gain, volts per (radians per second squared).
+     * @param kVLinear   The linear velocity gain, volts per (meter per second).
+     * @param kALinear   The linear acceleration gain, volts per (meter per second squared).
+     * @param kVAngular  The angular velocity gain, volts per (radians per second).
+     * @param kAAngular  The angular acceleration gain, volts per (radians per second squared).
+     * @param maxVoltage The max voltage that can be applied. Control inputs above this will be clamped to it.
      * @return A LinearSystem representing the given characterized constants.
      * @see <a href="https://github.com/wpilibsuite/frc-characterization"> https://github.com/wpilibsuite/frc-characterization</a>
      */
@@ -281,6 +285,8 @@ public class LinearSystem<States extends Num, Inputs extends Num,
 
     /**
      * Returns the output matrix C.
+     *
+     * @return Output matrix C.
      */
     public Matrix<Outputs, States> getC() {
         return m_C;
@@ -424,6 +430,7 @@ public class LinearSystem<States extends Num, Inputs extends Num,
      * Returns an element of the control input vector u.
      *
      * @param i Row of u.
+     * @return The i-th element of control input vector u.
      */
     public double getU(int i) {
         return m_delayedU.get(i, 0);

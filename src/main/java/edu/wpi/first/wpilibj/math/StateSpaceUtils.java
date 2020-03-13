@@ -22,11 +22,12 @@ public class StateSpaceUtils {
      * <p>
      * Each element is squared and placed on the covariance matrix diagonal.
      *
-     * @param states  A Nat representing the states of the system.
-     * @param stdDevs For a Q matrix, its elements are the standard deviations of
-     *                each state from how the model behaves. For an R matrix, its
-     *                elements are the standard deviations for each output
-     *                measurement.
+     * @param <States> Num representing the states of the system.
+     * @param states   A Nat representing the states of the system.
+     * @param stdDevs  For a Q matrix, its elements are the standard deviations of
+     *                 each state from how the model behaves. For an R matrix, its
+     *                 elements are the standard deviations for each output
+     *                 measurement.
      * @return Process noise or measurement noise covariance matrix.
      */
     public static <States extends Num> Matrix<States, States> makeCovMatrix(
@@ -43,6 +44,7 @@ public class StateSpaceUtils {
      * Creates a vector of normally distributed white noise with the given noise
      * intensities for each element.
      *
+     * @param <N>     Num representing the dimensionality of  the noise vector to create.
      * @param n       A Nat representing the dimensionality of  the noise vector to create.
      * @param stdDevs A matrix whose elements are the standard deviations of each
      *                element of the noise vector.
@@ -66,9 +68,10 @@ public class StateSpaceUtils {
      *
      * @param <States>  A Num representing the number of states.
      * @param states    A Nat representing the number of states.
+     * @param A         The system matrix A.
      * @param Q         Continuous process noise covariance matrix.
      * @param dtSeconds Discretization timestep.
-     * @return the discretized process noise covariance matrix.
+     * @return The discretized process noise covariance matrix.
      */
     public static <States extends Num> Matrix<States, States> discretizeProcessNoiseCov(
             Nat<States> states, Matrix<States, States> A, Matrix<States, States> Q, double dtSeconds) {
@@ -166,6 +169,7 @@ public class StateSpaceUtils {
      * @param <Outputs> Nat representing the number of outputs.
      * @param R         Continuous measurement noise covariance matrix.
      * @param dtSeconds Discretization timestep.
+     * @return Discretized version of the provided continuous measurement noise covariance matrix.
      */
     public static <Outputs extends Num> Matrix<Outputs, Outputs> discretizeR(Matrix<Outputs, Outputs> R, double dtSeconds) {
         return R.div(dtSeconds);
@@ -175,8 +179,10 @@ public class StateSpaceUtils {
      * Returns a discretized version of the provided continuous measurement noise
      * covariance matrix.
      *
+     * @param <Outputs> Num representing the size of R.
      * @param R         Continuous measurement noise covariance matrix.
      * @param dtSeconds Discretization timestep.
+     * @return A discretized version of the provided continuous measurement noise covariance matrix.
      */
     public static <Outputs extends Num> Matrix<Outputs, Outputs> discretizeMeasurementNoiseCov(
             Matrix<Outputs, Outputs> R, double dtSeconds) {
@@ -211,10 +217,10 @@ public class StateSpaceUtils {
     /**
      * Discretizes the given continuous A and B matrices.
      *
-     * @param <States> Nat representing the states of the system.
-     * @param <Inputs> Nat representing the inputs to the system.
-     * @param states Num representing the states of the system.
-     * @param inputs Num representing the inputs to the system.
+     * @param <States>  Nat representing the states of the system.
+     * @param <Inputs>  Nat representing the inputs to the system.
+     * @param states    Num representing the states of the system.
+     * @param inputs    Num representing the inputs to the system.
      * @param contA     Continuous system matrix.
      * @param contB     Continuous input matrix.
      * @param dtSeconds Discretization timestep.
@@ -429,8 +435,11 @@ public class StateSpaceUtils {
      * any, have absolute values less than one, where an eigenvalue is
      * uncontrollable if rank(lambda * I - A, B) %3C n where n is number of states.
      *
-     * @param A System matrix.
-     * @param B Input matrix.
+     * @param <S> Num representing the size of A.
+     * @param <I> Num representing the columns of B.
+     * @param A   System matrix.
+     * @param B   Input matrix.
+     * @return If the system is stabilizable.
      */
     public static <S extends Num, I extends Num> boolean isStabilizable(
             Matrix<S, S> A, Matrix<S, I> B
@@ -447,6 +456,7 @@ public class StateSpaceUtils {
      * uncontrollable if rank(lambda * I - A, B) %3C n where n is number of states.
      *
      * @param A System matrix.
+     * @return If the system is stabilizable or not.
      */
     public static SimpleMatrix isStabilizable(
             SimpleMatrix A

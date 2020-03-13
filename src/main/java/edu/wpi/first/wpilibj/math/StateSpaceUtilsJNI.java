@@ -24,6 +24,8 @@ public final class StateSpaceUtilsJNI {
 
     /**
      * Force load the library.
+     *
+     * @throws IOException if the library could not be found.
      */
     public static synchronized void forceLoad() throws IOException {
         if (libraryLoaded) {
@@ -50,8 +52,11 @@ public final class StateSpaceUtilsJNI {
      * any, have absolute values less than one, where an eigenvalue is
      * uncontrollable if rank(lambda * I - A, B) &lt; n where n is number of states.
      *
-     * @param A System matrix.
-     * @param B Input matrix.
+     * @param states the number of states of the system.
+     * @param inputs the number of inputs to the system.
+     * @param A      System matrix.
+     * @param B      Input matrix.
+     * @return If the system is stabilizable.
      */
     public static native boolean isStabilizable(int states, int inputs, double[] A, double[] B);
 

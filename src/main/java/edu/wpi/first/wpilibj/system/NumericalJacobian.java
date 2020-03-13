@@ -15,10 +15,14 @@ public class NumericalJacobian {
     /**
      * Computes the numerical Jacobian with respect to x for f(x).
      *
-     * @param rows Number of rows in the result of f(x).
-     * @param cols Number of columns in the result of f(x).
-     * @param f    Vector-valued function from which to compute the Jacobian.
-     * @param x    Vector argument.
+     * @param <Rows>   Number of rows in the result of f(x).
+     * @param <States> Num representing the number of rows in the output of f.
+     * @param <Cols>   Number of columns in the result of f(x).
+     * @param rows     Number of rows in the result of f(x).
+     * @param cols     Number of columns in the result of f(x).
+     * @param f        Vector-valued function from which to compute the Jacobian.
+     * @param x        Vector argument.
+     * @return The numerical Jacobian with respect to x for f(x, u, ...).
      */
     public static <Rows extends Num, Cols extends Num, States extends Num> Matrix<Rows, Cols> numericalJacobian(
             Nat<Rows> rows,
@@ -44,13 +48,16 @@ public class NumericalJacobian {
     /**
      * Returns numerical Jacobian with respect to x for f(x, u, ...).
      *
-     * @param <D>
-     * @param rows   Number of rows in the result of f(x, u).
-     * @param states Number of rows in x.
-     * @param f      Vector-valued function from which to compute Jacobian.
-     * @param x      State vector.
-     * @param u      Input vector.
-     * @return the numerical Jacobian with respect to x for f(x, u, ...).
+     * @param <Rows>   Number of rows in the result of f(x, u).
+     * @param <States> Number of rows in x.
+     * @param <Inputs> Number of rows in the second input to f.
+     * @param <D>      Num representing the rows in the output of f.
+     * @param rows     Number of rows in the result of f(x, u).
+     * @param states   Number of rows in x.
+     * @param f        Vector-valued function from which to compute Jacobian.
+     * @param x        State vector.
+     * @param u        Input vector.
+     * @return The numerical Jacobian with respect to x for f(x, u, ...).
      */
     public static <Rows extends Num, States extends Num, Inputs extends Num, D extends Num> Matrix<Rows, States> numericalJacobianX(
             Nat<Rows> rows,
