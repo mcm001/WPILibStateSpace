@@ -50,6 +50,7 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
 
     /**
      * If the controller is enabled.
+     *
      * @return if the controller is enabled.
      */
     public boolean isEnabled() {
@@ -61,6 +62,15 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
      */
     public Matrix<States, N1> getXHat() {
         return m_observer.getXhat();
+    }
+
+    /**
+     * Set the initial state estimate x-hat.
+     *
+     * @param xHat The initial state estimate x-hat.
+     */
+    public void setXHat(Matrix<States, N1> xHat) {
+        m_observer.setXhat(xHat);
     }
 
     /**
@@ -77,6 +87,15 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
      */
     public Matrix<States, N1> getNextR() {
         return m_nextR;
+    }
+
+    /**
+     * Set the next reference r.
+     *
+     * @param nextR Next reference.
+     */
+    public void setNextR(Matrix<States, N1> nextR) {
+        m_nextR = nextR;
     }
 
     /**
@@ -105,15 +124,6 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
     }
 
     /**
-     * Set the initial state estimate x-hat.
-     *
-     * @param xHat The initial state estimate x-hat.
-     */
-    public void setXHat(Matrix<States, N1> xHat) {
-        m_observer.setXhat(xHat);
-    }
-
-    /**
      * Set an element of the initial state estimate x-hat.
      *
      * @param i     Row of x-hat.
@@ -121,15 +131,6 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
      */
     public void setXHat(int i, double value) {
         m_observer.setXhat(i, value);
-    }
-
-    /**
-     * Set the next reference r.
-     *
-     * @param nextR Next reference.
-     */
-    public void setNextR(Matrix<States, N1> nextR) {
-        m_nextR = nextR;
     }
 
     /**
@@ -190,7 +191,7 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
     /**
      * Sets new controller output, projects model forward, and runs observer
      * prediction.
-     *
+     * <p>
      * After calling this, the user should send the elements of u to the
      * actuators.
      *
@@ -201,6 +202,13 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
         m_observer.predict(m_controller.getU(), dtSeconds);
     }
 
+    /**
+     * Returns the current controller index.
+     */
+    public int getIndex() {
+//        return m_plant.getIndex(); // TODO get impl from Tyler
+        return 0;
+    }
 
     /**
      * Sets the current controller to be "index". This can be used for gain
@@ -212,14 +220,6 @@ public class LinearSystemLoop<States extends Num, Inputs extends Num,
 //        m_plant.setIndex(index); // TODO get impl from Tyler
 //        m_controller.setIndex(index);
 //        m_observer.setIndex(index);
-    }
-
-    /**
-     * Returns the current controller index.
-     */
-    public int getIndex() {
-//        return m_plant.getIndex(); // TODO get impl from Tyler
-        return 0;
     }
 
 }

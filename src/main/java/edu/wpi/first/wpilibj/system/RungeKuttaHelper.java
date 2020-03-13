@@ -11,11 +11,10 @@ import java.util.function.Function;
 public class RungeKuttaHelper {
 
     /**
-     *
      * Performs Runge Kutta integration (4th order).
      *
-     * @param f The function to integrate, which takes one argument x.
-     * @param x The initial value of x.
+     * @param f         The function to integrate, which takes one argument x.
+     * @param x         The initial value of x.
      * @param dtSeconds The time over which to integrate.
      * @return
      */
@@ -33,12 +32,11 @@ public class RungeKuttaHelper {
     }
 
     /**
-     *
      * Performs Runge Kutta integration (4th order).
      *
-     * @param f The function to integrate. It must take two arguments x and u.
-     * @param x The initial value of x.
-     * @param u The value u held constant over the integration period.
+     * @param f         The function to integrate. It must take two arguments x and u.
+     * @param x         The initial value of x.
+     * @param u         The value u held constant over the integration period.
      * @param dtSeconds The time over which to integrate.
      */
     public static double rungeKutta(
@@ -56,9 +54,9 @@ public class RungeKuttaHelper {
     /**
      * Performs 4th order Runge-Kutta integration of dx/dt = f(x, u) for dt.
      *
-     * @param f  The function to integrate. It must take two arguments x and u.
-     * @param x  The initial value of x.
-     * @param u  The value u held constant over the integration period.
+     * @param f         The function to integrate. It must take two arguments x and u.
+     * @param x         The initial value of x.
+     * @param u         The value u held constant over the integration period.
      * @param dtSeconds The time over which to integrate.
      */
     public static <States extends Num, Inputs extends Num> Matrix<States, N1> rungeKutta(
@@ -76,8 +74,8 @@ public class RungeKuttaHelper {
     /**
      * Performs 4th order Runge-Kutta integration of dx/dt = f(x) for dt.
      *
-     * @param f  The function to integrate. It must take one argument x.
-     * @param x  The initial value of x.
+     * @param f         The function to integrate. It must take one argument x.
+     * @param x         The initial value of x.
      * @param dtSeconds The time over which to integrate.
      */
     public static <States extends Num> Matrix<States, N1> rungeKutta(

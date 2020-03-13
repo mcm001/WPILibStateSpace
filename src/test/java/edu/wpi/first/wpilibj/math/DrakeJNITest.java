@@ -7,12 +7,13 @@ import java.io.IOException;
 
 public class DrakeJNITest {
 
-  @Test public void testLink() {
-    try {
-      DrakeJNI.forceLoad();
-    } catch (IOException e) {
-      e.printStackTrace();
-      Assert.fail();
+    @Test
+    public void testLink() {
+        try {
+            DrakeJNI.forceLoad();
+        } catch (IOException e) {
+            e.printStackTrace();
+            Assert.fail();
+        }
     }
-  }
 }

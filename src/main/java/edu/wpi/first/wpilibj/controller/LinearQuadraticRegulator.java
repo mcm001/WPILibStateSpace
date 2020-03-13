@@ -3,7 +3,9 @@ package edu.wpi.first.wpilibj.controller;
 import edu.wpi.first.wpilibj.math.Drake;
 import edu.wpi.first.wpilibj.math.StateSpaceUtils;
 import edu.wpi.first.wpilibj.system.LinearSystem;
-import edu.wpi.first.wpiutil.math.*;
+import edu.wpi.first.wpiutil.math.Matrix;
+import edu.wpi.first.wpiutil.math.Nat;
+import edu.wpi.first.wpiutil.math.Num;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.simple.SimpleMatrix;
@@ -33,21 +35,13 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num,
     private Matrix<States, Inputs> m_discB;
     private Matrix<States, States> m_discA;
 
-    public Matrix<Inputs, N1> getU() {
-        return m_u;
-    }
-
-    public Matrix<States, N1> getR() {
-        return m_r;
-    }
-
     /**
      * Constructs a controller with the given coefficients and plant.
      *
-     * @param plant The plant being controlled.
-     * @param qElms The maximum desired error tolerance for each state.
-     * @param rElms The maximum desired control effort for each input.
-     * @param dtSeconds     Discretization timestep.
+     * @param plant     The plant being controlled.
+     * @param qElms     The maximum desired error tolerance for each state.
+     * @param rElms     The maximum desired control effort for each input.
+     * @param dtSeconds Discretization timestep.
      */
     public LinearQuadraticRegulator(
             Nat<States> states, Nat<Inputs> inputs,
@@ -62,11 +56,11 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num,
     /**
      * Constructs a controller with the given coefficients and plant.
      *
-     * @param a      Continuous system matrix of the plant being controlled.
-     * @param b      Continuous input matrix of the plant being controlled.
-     * @param qElems The maximum desired error tolerance for each state.
-     * @param rElems The maximum desired control effort for each input.
-     * @param dtSeconds     Discretization timestep.
+     * @param a         Continuous system matrix of the plant being controlled.
+     * @param b         Continuous input matrix of the plant being controlled.
+     * @param qElems    The maximum desired error tolerance for each state.
+     * @param rElems    The maximum desired control effort for each input.
+     * @param dtSeconds Discretization timestep.
      */
     public LinearQuadraticRegulator(
             Nat<States> states, Nat<Inputs> inputs,
@@ -104,16 +98,23 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num,
         this.m_discA = new Matrix<>(discA);
 
         var S = Drake.discreteAlgebraicRiccatiEquation(discA, discB, Q.getStorage(), R.getStorage());
-        
+
 //        var temp = (m_discB.transpose().getStorage().mult(S).mult(discB)).plus(R.getStorage());
 //        m_K = new Matrix<>(
 //            StateSpaceUtils.lltDecompose(temp).solve(discB.transpose().mult(S).mult(discA)));
-        
-         m_K = new Matrix<>((discB.transpose().mult(S).mult(discB).plus(R.getStorage())).invert().mult(discB.transpose()).mult(S).mult(discA)); // TODO (HIGH) SWITCH ALGORITHMS
+
+        m_K = new Matrix<>((discB.transpose().mult(S).mult(discB).plus(R.getStorage())).invert().mult(discB.transpose()).mult(S).mult(discA)); // TODO (HIGH) SWITCH ALGORITHMS
 
         this.m_r = new Matrix<>(new SimpleMatrix(states.getNum(), 1));
         this.m_u = new Matrix<>(new SimpleMatrix(inputs.getNum(), 1));
-        
+    }
+
+    public Matrix<Inputs, N1> getU() {
+        return m_u;
+    }
+
+    public Matrix<States, N1> getR() {
+        return m_r;
     }
 
     /**
@@ -156,7 +157,7 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num,
      * @param x The current state x.
      */
     public void update(Matrix<States, N1> x) {
-        if(m_enabled) {
+        if (m_enabled) {
             m_u = m_K.times(m_r.minus(x)).plus(new Matrix<>(StateSpaceUtils.householderQrDecompose(m_discB.getStorage()).solve((m_r.minus(m_discA.times(m_r))).getStorage())));
         }
     }
@@ -164,11 +165,11 @@ public class LinearQuadraticRegulator<States extends Num, Inputs extends Num,
     /**
      * Set a new reference and update the controller.
      *
-     * @param x The current state x.
+     * @param x     The current state x.
      * @param nextR the next reference vector r.
      */
     public void update(Matrix<States, N1> x, Matrix<States, N1> nextR) {
-        if(m_enabled) {
+        if (m_enabled) {
             Matrix<States, N1> error = m_r.minus(x);
             Matrix<Inputs, N1> feedBack = m_K.times(error);
             Matrix<Inputs, N1> feedForward = new Matrix<>(StateSpaceUtils.householderQrDecompose(m_discB.getStorage()).solve((nextR.minus(m_discA.times(m_r))).getStorage()));

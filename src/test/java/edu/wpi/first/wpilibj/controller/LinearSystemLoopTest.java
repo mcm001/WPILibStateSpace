@@ -5,15 +5,14 @@ import edu.wpi.first.wpilibj.system.LinearSystem;
 import edu.wpi.first.wpilibj.system.LinearSystemLoop;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
-import edu.wpi.first.wpiutil.math.*;
+import edu.wpi.first.wpiutil.math.MatBuilder;
+import edu.wpi.first.wpiutil.math.Matrix;
+import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N2;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.Assert;
 import org.junit.Test;
-import org.knowm.xchart.SwingWrapper;
-import org.knowm.xchart.XYChart;
-import org.knowm.xchart.XYChartBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,10 +23,10 @@ import static org.junit.Assert.assertTrue;
 
 public class LinearSystemLoopTest {
 
-    private static final double kPositionStddev = 0.0001;
-    private final LinearSystemLoop<N2, N1, N1> m_loop;
     public static final double kDt = 0.00505;
+    private static final double kPositionStddev = 0.0001;
     private static final Random random = new Random();
+    private final LinearSystemLoop<N2, N1, N1> m_loop;
 
     public LinearSystemLoopTest() {
         LinearSystem<N2, N1, N1> plant = LinearSystem.createElevatorSystem(DCMotor.getVex775Pro(2), 5, 0.0181864, 1.0, 12.0);
@@ -59,7 +58,7 @@ public class LinearSystemLoopTest {
 
     private static void updateOneState(LinearSystemLoop<N1, N1, N1> loop, double noise) {
         Matrix<N1, N1> y = loop.getPlant().calculateY(loop.getXHat(), loop.getU()).plus(
-            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(noise)
+                new MatBuilder<>(Nat.N1(), Nat.N1()).fill(noise)
         );
 
         loop.correct(y);
@@ -75,7 +74,7 @@ public class LinearSystemLoopTest {
         var constraints = new TrapezoidProfile.Constraints(4, 3);
         m_loop.setNextR(references);
 
-        for(int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 1000; i++) {
 
             // trapezoidal profile gang
             var profile = new TrapezoidProfile(
@@ -100,17 +99,17 @@ public class LinearSystemLoopTest {
     public void testFlywheelEnabled() {
 
         LinearSystem<N1, N1, N1> plant = LinearSystem.createFlywheelSystem(DCMotor.getNEO(2),
-            0.00289, 1.0, 12.0);
+                0.00289, 1.0, 12.0);
         KalmanFilter<N1, N1, N1> observer = new KalmanFilter<>(Nat.N1(), Nat.N1(), Nat.N1(), plant,
-            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(1.0),
-            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(0.01), kDt);
+                new MatBuilder<>(Nat.N1(), Nat.N1()).fill(1.0),
+                new MatBuilder<>(Nat.N1(), Nat.N1()).fill(0.01), kDt);
 
         var qElms = new MatBuilder<>(Nat.N1(), Nat.N1()).fill(9.0);
         var rElms = new MatBuilder<>(Nat.N1(), Nat.N1()).fill(12.0);
 
         var controller = new LinearQuadraticRegulator<>(
-            Nat.N1(), Nat.N1(),
-            plant, qElms, rElms, kDt);
+                Nat.N1(), Nat.N1(),
+                plant, qElms, rElms, kDt);
 
         var loop = new LinearSystemLoop<>(Nat.N1(), Nat.N1(), Nat.N1(), plant, controller, observer);
 
@@ -127,9 +126,9 @@ public class LinearSystemLoopTest {
         List<Double> error = new ArrayList<>();
 
         var time = 0.0;
-        while(time < 10 || Math.abs(loop.getError(0)) < 3) {
+        while (time < 10 || Math.abs(loop.getError(0)) < 3) {
 
-            if(time > 10) {
+            if (time > 10) {
                 break;
             }
 

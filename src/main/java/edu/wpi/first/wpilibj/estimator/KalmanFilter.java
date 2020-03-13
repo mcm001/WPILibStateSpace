@@ -3,11 +3,12 @@ package edu.wpi.first.wpilibj.estimator;
 import edu.wpi.first.wpilibj.math.Drake;
 import edu.wpi.first.wpilibj.math.StateSpaceUtils;
 import edu.wpi.first.wpilibj.system.LinearSystem;
-import edu.wpi.first.wpiutil.math.*;
+import edu.wpi.first.wpiutil.math.Matrix;
+import edu.wpi.first.wpiutil.math.MatrixUtils;
+import edu.wpi.first.wpiutil.math.Nat;
+import edu.wpi.first.wpiutil.math.Num;
 import edu.wpi.first.wpiutil.math.numbers.N1;
 import org.ejml.simple.SimpleMatrix;
-
-import java.util.Objects;
 
 public class KalmanFilter<States extends Num, Inputs extends Num,
         Outputs extends Num> {
@@ -31,7 +32,7 @@ public class KalmanFilter<States extends Num, Inputs extends Num,
 
     /**
      * Error covariance matrix.
-     * */
+     */
     private Matrix<States, States> m_P;
 
     /**
@@ -60,7 +61,7 @@ public class KalmanFilter<States extends Num, Inputs extends Num,
             Matrix<States, N1> stateStdDevs,
             Matrix<Outputs, N1> measurementStdDevs,
             double dtSeconds
-            ) {
+    ) {
         this.states = states;
         this.inputs = inputs;
         this.outputs = outputs;
@@ -77,9 +78,9 @@ public class KalmanFilter<States extends Num, Inputs extends Num,
         m_discR = StateSpaceUtils.discretizeR(m_contR, dtSeconds);
 
         if (StateSpaceUtils.isStabilizable(discA.transpose(),
-            plant.getC().transpose()) && outputs.getNum() <= states.getNum()) {
+                plant.getC().transpose()) && outputs.getNum() <= states.getNum()) {
             m_P = new Matrix<>(Drake.discreteAlgebraicRiccatiEquation(
-                discA.transpose(), plant.getC().transpose(), discQ, m_discR));
+                    discA.transpose(), plant.getC().transpose(), discQ, m_discR));
         } else {
             m_P = new Matrix<>(new SimpleMatrix(states.getNum(), states.getNum()));
         }
@@ -89,7 +90,9 @@ public class KalmanFilter<States extends Num, Inputs extends Num,
     /**
      * Returns the error covariance matrix P.
      */
-    public Matrix<States, States> getP() { return m_P; }
+    public Matrix<States, States> getP() {
+        return m_P;
+    }
 
     /**
      * Returns an element of the error covariance matrix P.
@@ -97,21 +100,17 @@ public class KalmanFilter<States extends Num, Inputs extends Num,
      * @param i Row of P.
      * @param j Column of P.
      */
-    public double getP(int i, int j) { return m_P.get(i, j); }
-
+    public double getP(int i, int j) {
+        return m_P.get(i, j);
+    }
 
 
     /**
      * Returns the state estimate x-hat.
      */
-    public Matrix<States, N1> getXhat() { return m_plant.getX(); }
-
-    /**
-     * Returns an element of the state estimate x-hat.
-     *
-     * @param i Row of x-hat.
-     */
-    public double getXhat(int i) { return m_plant.getX(i); }
+    public Matrix<States, N1> getXhat() {
+        return m_plant.getX();
+    }
 
     /**
      * Set initial state estimate x-hat.
@@ -123,22 +122,35 @@ public class KalmanFilter<States extends Num, Inputs extends Num,
     }
 
     /**
+     * Returns an element of the state estimate x-hat.
+     *
+     * @param i Row of x-hat.
+     */
+    public double getXhat(int i) {
+        return m_plant.getX(i);
+    }
+
+    /**
      * Set an element of the initial state estimate x-hat.
      *
      * @param i     Row of x-hat.
      * @param value Value for element of x-hat.
      */
-    public void setXhat(int i, double value) { m_plant.setX(i, value); }
+    public void setXhat(int i, double value) {
+        m_plant.setX(i, value);
+    }
 
     /**
      * Resets the observer.
      */
-    public void reset() { m_plant.reset(); }
+    public void reset() {
+        m_plant.reset();
+    }
 
     /**
      * Project the model into the future with a new control input u.
      *
-     * @param u  New control input from controller.
+     * @param u         New control input from controller.
      * @param dtSeconds Timestep for prediction.
      */
     public void predict(Matrix<Inputs, N1> u, double dtSeconds) {
@@ -164,7 +176,7 @@ public class KalmanFilter<States extends Num, Inputs extends Num,
 
     /**
      * Correct the state estimate x-hat using the measurements in y.
-     *
+     * <p>
      * This is useful for when the measurements available during a timestep's
      * Correct() call vary. The C matrix passed to the constructor is used if one
      * is not provided (the two-argument version of this function).

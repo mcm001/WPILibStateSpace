@@ -12,7 +12,7 @@ public class RungeKuttaTest {
     @Test
     public void testExponential() {
 
-        Matrix<N1, N1> y0 = new Matrix<>(new SimpleMatrix(1, 1, true, new double[] {0.0}));
+        Matrix<N1, N1> y0 = new Matrix<>(new SimpleMatrix(1, 1, true, new double[]{0.0}));
 
         //noinspection SuspiciousNameCombination
         var y1 = RungeKuttaHelper.rungeKutta(

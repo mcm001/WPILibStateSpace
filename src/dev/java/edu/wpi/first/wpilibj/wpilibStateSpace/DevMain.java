@@ -7,24 +7,21 @@
 
 package edu.wpi.first.wpilibj.wpilibStateSpace;
 
-import edu.wpi.first.hal.HALUtil;
-import edu.wpi.first.networktables.NetworkTablesJNI;
 import edu.wpi.first.wpilibj.math.DrakeJNI;
-import edu.wpi.first.wpiutil.RuntimeDetector;
 
 public final class DevMain {
-  /**
-   * Main entry point.
-   */
-  public static void main(String[] args) {
-    System.out.println("Hello World!");
-    try {
-      DrakeJNI.forceLoad();
-    } catch (Exception e) {
-      e.printStackTrace();
+    private DevMain() {
     }
-  }
 
-  private DevMain() {
-  }
+    /**
+     * Main entry point.
+     */
+    public static void main(String[] args) {
+        System.out.println("Hello World!");
+        try {
+            DrakeJNI.forceLoad();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

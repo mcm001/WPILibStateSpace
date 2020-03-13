@@ -1,8 +1,6 @@
 package edu.wpi.first.wpilibj.controller;
 
-import edu.wpi.first.wpilibj.estimator.KalmanFilter;
 import edu.wpi.first.wpilibj.system.LinearSystem;
-import edu.wpi.first.wpilibj.system.LinearSystemLoop;
 import edu.wpi.first.wpilibj.system.plant.DCMotor;
 import edu.wpi.first.wpiutil.math.MatBuilder;
 import edu.wpi.first.wpiutil.math.Matrix;
@@ -11,7 +9,6 @@ import edu.wpi.first.wpiutil.math.numbers.N1;
 import edu.wpi.first.wpiutil.math.numbers.N2;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 public class LinearQuadraticRegulatorTest {
@@ -29,7 +26,7 @@ public class LinearQuadraticRegulatorTest {
 
         var m = 4.0;
         var r = 0.4;
-        var J = 1d/3d * m * r * r;
+        var J = 1d / 3d * m * r * r;
         var G = 100.0;
 
         armPlant = LinearSystem.createSingleJointedArmSystem(motors, J, G, 12.0);
@@ -59,8 +56,8 @@ public class LinearQuadraticRegulatorTest {
 
         var k = controller.getK();
 
-        Assert.assertEquals(522.153, k.get(0,0), 0.1);
-        Assert.assertEquals(38.2, k.get(0,1), 0.1);
+        Assert.assertEquals(522.153, k.get(0, 0), 0.1);
+        Assert.assertEquals(38.2, k.get(0, 1), 0.1);
     }
 
     @Test
@@ -102,8 +99,8 @@ public class LinearQuadraticRegulatorTest {
 
         var k = controller.getK();
 
-        Assert.assertEquals(19.16, k.get(0,0), 0.1);
-        Assert.assertEquals(3.32, k.get(0,1), 0.1);
+        Assert.assertEquals(19.16, k.get(0, 0), 0.1);
+        Assert.assertEquals(3.32, k.get(0, 1), 0.1);
     }
 
 }

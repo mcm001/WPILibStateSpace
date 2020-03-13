@@ -15,7 +15,6 @@ import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.numbers.*;
 import org.ejml.simple.SimpleMatrix;
 import org.junit.Test;
-import org.knowm.xchart.SwingWrapper;
 import org.knowm.xchart.XYChartBuilder;
 
 import java.util.ArrayList;

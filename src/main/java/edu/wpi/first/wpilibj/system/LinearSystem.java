@@ -8,8 +8,6 @@ import edu.wpi.first.wpiutil.math.numbers.N2;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.simple.SimpleMatrix;
 
-import java.util.Objects;
-
 public class LinearSystem<States extends Num, Inputs extends Num,
         Outputs extends Num> {
 
@@ -42,36 +40,30 @@ public class LinearSystem<States extends Num, Inputs extends Num,
      * Maximum allowable input vector.
      */
     private final Matrix<Inputs, N1> m_uMax;
-
-    /**
-     * State vector.
-     */
-    private Matrix<States, N1> m_x;
-
-    /**
-     * Output vector.
-     */
-    private Matrix<Outputs, N1> m_y;
-
-    /**
-     * Delayed u since predict and correct steps are run in reverse.
-     */
-    private Matrix<Inputs, N1> m_delayedU;
-
     /**
      * The states of the system represented as a Nat.
      */
     private final Nat<States> states;
-
     /**
      * The inputs of the system represented as a Nat.
      */
     private final Nat<Inputs> inputs;
-
     /**
      * The outputs of the system represented as a Nat.
      */
     private final Nat<Outputs> outputs;
+    /**
+     * State vector.
+     */
+    private Matrix<States, N1> m_x;
+    /**
+     * Output vector.
+     */
+    private Matrix<Outputs, N1> m_y;
+    /**
+     * Delayed u since predict and correct steps are run in reverse.
+     */
+    private Matrix<Inputs, N1> m_delayedU;
 
     public LinearSystem(Nat<States> states, Nat<Inputs> inputs, Nat<Outputs> outputs,
                         Matrix<States, States> A, Matrix<States, Inputs> B,
@@ -96,12 +88,107 @@ public class LinearSystem<States extends Num, Inputs extends Num,
         reset();
     }
 
+    public static LinearSystem<N2, N1, N1> createElevatorSystem(DCMotor motor, double massKg, double radiusMeters, double G, double maxVoltage) {
+        return new LinearSystem<>(Nat.N2(), Nat.N1(), Nat.N1(),
+                new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0, 1,
+                        0, -Math.pow(G, 2) * motor.KtNMPerAmp /
+                                (motor.Rohms * radiusMeters * radiusMeters * massKg * motor.KvRadPerSecPerVolt)),
+                new MatBuilder<>(Nat.N2(), Nat.N1()).fill(
+                        0, (G * motor.KtNMPerAmp / (motor.Rohms * radiusMeters * massKg))),
+                new MatBuilder<>(Nat.N1(), Nat.N2()).fill(1, 0),
+                MatrixUtils.zeros(Nat.N1()),
+                new MatBuilder<>(Nat.N1(), Nat.N1()).fill(-maxVoltage),
+                new MatBuilder<>(Nat.N1(), Nat.N1()).fill(maxVoltage));
+    }
+
+    public static LinearSystem<N1, N1, N1> createFlywheelSystem(DCMotor motor, double jKgSquaredMeters, double G, double maxVoltage) {
+        return new LinearSystem<>(Nat.N1(), Nat.N1(), Nat.N1(),
+                new MatBuilder<>(Nat.N1(), Nat.N1()).fill(
+                        -G * G * motor.KtNMPerAmp /
+                                (motor.KvRadPerSecPerVolt * motor.Rohms * jKgSquaredMeters)),
+                new MatBuilder<>(Nat.N1(), Nat.N1()).fill(G * motor.KtNMPerAmp / (motor.Rohms * jKgSquaredMeters)),
+                MatrixUtils.eye(Nat.N1()),
+                MatrixUtils.zeros(Nat.N1()),
+                new MatBuilder<>(Nat.N1(), Nat.N1()).fill(-maxVoltage),
+                new MatBuilder<>(Nat.N1(), Nat.N1()).fill(maxVoltage));
+    }
+
+    public static LinearSystem<N2, N1, N1> createSingleJointedArmSystem(DCMotor motor, double jKgSquaredMeters, double G, double maxVoltage) {
+        return new LinearSystem<>(Nat.N2(), Nat.N1(), Nat.N1(),
+                new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0, 1,
+                        0, -Math.pow(G, 2) * motor.KtNMPerAmp /
+                                (motor.KvRadPerSecPerVolt * motor.Rohms * jKgSquaredMeters)),
+                new MatBuilder<>(Nat.N2(), Nat.N1()).fill(0, (G * motor.KtNMPerAmp / (motor.Rohms * jKgSquaredMeters))),
+                new MatBuilder<>(Nat.N1(), Nat.N2()).fill(1, 0),
+                MatrixUtils.zeros(Nat.N1()),
+                new MatBuilder<>(Nat.N1(), Nat.N1()).fill(-maxVoltage),
+                new MatBuilder<>(Nat.N1(), Nat.N1()).fill(maxVoltage));
+    }
+
+    /**
+     * Identify a velocity system from it's kV (volts/(unit/sec)) and kA (volts/(unit/sec^2).
+     * These constants cam be found using frc-characterization.
+     *
+     * @see <a href="https://github.com/wpilibsuite/frc-characterization"> https://github.com/wpilibsuite/frc-characterization</a>
+     */
+    public static LinearSystem<N1, N1, N1> identifyVelocitySystem(double kV, double kA, double maxVoltage) {
+        return new LinearSystem<>(Nat.N1(), Nat.N1(), Nat.N1(),
+                new MatBuilder<>(Nat.N1(), Nat.N1()).fill(-kV / kA),
+                new MatBuilder<>(Nat.N1(), Nat.N1()).fill(1.0 / kA),
+                new MatBuilder<>(Nat.N1(), Nat.N1()).fill(1.0),
+                new MatBuilder<>(Nat.N1(), Nat.N1()).fill(0.0),
+                new MatBuilder<>(Nat.N1(), Nat.N1()).fill(-maxVoltage),
+                new MatBuilder<>(Nat.N1(), Nat.N1()).fill(maxVoltage));
+    }
+
+    /**
+     * Identify a position system from it's kV (volts/(unit/sec)) and kA (volts/(unit/sec^2).
+     * These constants cam be found using frc-characterization.
+     *
+     * @see <a href="https://github.com/wpilibsuite/frc-characterization"> https://github.com/wpilibsuite/frc-characterization</a>
+     */
+    public static LinearSystem<N2, N1, N1> identifyPositionSystem(double kV, double kA, double maxVoltage) {
+        return new LinearSystem<>(Nat.N2(), Nat.N1(), Nat.N1(),
+                new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0.0, 1.0, 0.0, -kV / kA),
+                new MatBuilder<>(Nat.N2(), Nat.N1()).fill(0.0, 1.0 / kA),
+                new MatBuilder<>(Nat.N1(), Nat.N2()).fill(1.0, 0.0),
+                new MatBuilder<>(Nat.N1(), Nat.N1()).fill(0.0),
+                new MatBuilder<>(Nat.N1(), Nat.N1()).fill(-maxVoltage),
+                new MatBuilder<>(Nat.N1(), Nat.N1()).fill(maxVoltage));
+    }
+
+    /**
+     * Identify a standard differential drive drivetrain, given the drivetrain's
+     * kV and kA in both linear (volts/(meter/sec) and volts/(meter/sec^2)) and
+     * angular (volts/(radian/sec) and volts/(radian/sec^2)) cases. This can be
+     * found using frc-characterization.
+     *
+     * @see <a href="https://github.com/wpilibsuite/frc-characterization"> https://github.com/wpilibsuite/frc-characterization</a>
+     */
+    public static LinearSystem<N2, N2, N2> identifyDrivetrainSystem(
+            double kVLinear, double kALinear, double kVAngular, double kAAngular, double maxVoltage) {
+
+        final double c = 0.5 / (kALinear * kAAngular);
+        final double A1 = c * (-kALinear * kVAngular - kVLinear * kAAngular);
+        final double A2 = c * (kALinear * kVAngular - kVLinear * kAAngular);
+        final double B1 = c * (kALinear + kAAngular);
+        final double B2 = c * (kAAngular - kALinear);
+
+        return new LinearSystem<>(Nat.N2(), Nat.N2(), Nat.N2(),
+                new MatBuilder<>(Nat.N2(), Nat.N2()).fill(A1, A2, A2, A1),
+                new MatBuilder<>(Nat.N2(), Nat.N2()).fill(B1, B2, B2, B1),
+                new MatBuilder<>(Nat.N2(), Nat.N2()).fill(1, 0, 0, 1),
+                new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0, 0, 0, 0),
+                new MatBuilder<>(Nat.N2(), Nat.N1()).fill(-maxVoltage, -maxVoltage),
+                new MatBuilder<>(Nat.N2(), Nat.N1()).fill(maxVoltage, maxVoltage));
+    }
+
     /**
      * Resets the plant.
      */
     public void reset() {
         m_x = MatrixUtils.zeros(states);
-        m_y  = MatrixUtils.zeros(outputs);
+        m_y = MatrixUtils.zeros(outputs);
         m_delayedU = MatrixUtils.zeros(inputs);
     }
 
@@ -213,6 +300,15 @@ public class LinearSystem<States extends Num, Inputs extends Num,
     }
 
     /**
+     * Set the initial state x.
+     *
+     * @param x The initial state.
+     */
+    public void setX(Matrix<States, N1> x) {
+        m_x = x;
+    }
+
+    /**
      * Returns an element of the current state x.
      *
      * @param i Row of x.
@@ -226,6 +322,15 @@ public class LinearSystem<States extends Num, Inputs extends Num,
      */
     public Matrix<Outputs, N1> getY() {
         return m_y;
+    }
+
+    /**
+     * Set the current measurement y.
+     *
+     * @param y The current measurement.
+     */
+    public void setY(Matrix<Outputs, N1> y) {
+        m_y = y;
     }
 
     /**
@@ -254,28 +359,14 @@ public class LinearSystem<States extends Num, Inputs extends Num,
     }
 
     /**
-     * Set the initial state x.
-     *
-     * @param x The initial state.
-     */
-    public void setX(Matrix<States, N1> x) {
-        m_x = x;
-    }
-
-    /**
      * Set an element of the initial state x.
      *
      * @param i     Row of x.
      * @param value Value of element of x.
      */
-    public void setX(int i, double value) { m_x.set(i, 0, value); }
-
-    /**
-     * Set the current measurement y.
-     *
-     * @param y The current measurement.
-     */
-    public void setY(Matrix<Outputs, N1> y) { m_y = y; }
+    public void setX(int i, double value) {
+        m_x.set(i, 0, value);
+    }
 
     /**
      * Set an element of the current measurement y.
@@ -283,13 +374,15 @@ public class LinearSystem<States extends Num, Inputs extends Num,
      * @param i     Row of y.
      * @param value Value of element of y.
      */
-    public void setY(int i, double value) { m_y.set(i, 0, value); }
+    public void setY(int i, double value) {
+        m_y.set(i, 0, value);
+    }
 
     /**
      * Computes the new x and y given the control input.
      *
-     * @param x The current state.
-     * @param u The control input.
+     * @param x         The current state.
+     * @param u         The control input.
      * @param dtSeconds Timestep for model update.
      */
     public void update(Matrix<States, N1> x, Matrix<Inputs, N1> u, double dtSeconds) {
@@ -300,12 +393,12 @@ public class LinearSystem<States extends Num, Inputs extends Num,
 
     /**
      * Computes the new x given the old x and the control input.
-     *
+     * <p>
      * This is used by state observers directly to run updates based on state
      * estimate.
      *
-     * @param x  The current state.
-     * @param u  The control input.
+     * @param x         The current state.
+     * @param u         The control input.
      * @param dtSeconds Timestep for model update.
      */
     public Matrix<States, N1> calculateX(Matrix<States, N1> x, Matrix<Inputs, N1> u, double dtSeconds) {
@@ -318,10 +411,10 @@ public class LinearSystem<States extends Num, Inputs extends Num,
     }
 
     private void discretizeAB(Matrix<States, States> contA,
-                  Matrix<States, Inputs> contB,
-                      double dtSeconds,
-                      Matrix<States, States> discA,
-                      Matrix<States, Inputs> discB) {
+                              Matrix<States, Inputs> contB,
+                              double dtSeconds,
+                              Matrix<States, States> discA,
+                              Matrix<States, Inputs> discB) {
 
         SimpleMatrix Mcont = new SimpleMatrix(0, 0);
         var scaledA = contA.times(dtSeconds);
@@ -348,7 +441,7 @@ public class LinearSystem<States extends Num, Inputs extends Num,
 
     /**
      * Computes the new y given the control input.
-     *
+     * <p>
      * This is used by state observers directly to run updates based on state
      * estimate.
      *
@@ -365,106 +458,11 @@ public class LinearSystem<States extends Num, Inputs extends Num,
         var result = new Matrix<Inputs, N1>(new SimpleMatrix(inputs.getNum(), 1));
         for (int i = 0; i < inputs.getNum(); i++) {
             result.set(i, 0, MathUtil.clamp(
-                            u.get(i, 0),
-                            m_uMin.get(i, 0),
-                            m_uMax.get(i, 0)));
+                    u.get(i, 0),
+                    m_uMin.get(i, 0),
+                    m_uMax.get(i, 0)));
         }
         return result;
-    }
-
-    public static LinearSystem<N2, N1, N1> createElevatorSystem(DCMotor motor, double massKg, double radiusMeters, double G, double maxVoltage) {
-        return new LinearSystem<>(Nat.N2(), Nat.N1(), Nat.N1(),
-            new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0, 1,
-                0, -Math.pow(G, 2) * motor.KtNMPerAmp /
-                    (motor.Rohms * radiusMeters * radiusMeters * massKg * motor.KvRadPerSecPerVolt)),
-            new MatBuilder<>(Nat.N2(), Nat.N1()).fill(
-                0, (G * motor.KtNMPerAmp / (motor.Rohms * radiusMeters * massKg))),
-            new MatBuilder<>(Nat.N1(), Nat.N2()).fill(1, 0),
-            MatrixUtils.zeros(Nat.N1()),
-            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(-maxVoltage),
-            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(maxVoltage));
-    }
-
-    public static LinearSystem<N1, N1, N1> createFlywheelSystem(DCMotor motor, double jKgSquaredMeters, double G, double maxVoltage) {
-        return new LinearSystem<>(Nat.N1(), Nat.N1(), Nat.N1(),
-            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(
-                -G * G * motor.KtNMPerAmp /
-                    (motor.KvRadPerSecPerVolt * motor.Rohms * jKgSquaredMeters)),
-            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(G * motor.KtNMPerAmp / (motor.Rohms * jKgSquaredMeters)),
-            MatrixUtils.eye(Nat.N1()),
-            MatrixUtils.zeros(Nat.N1()),
-            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(-maxVoltage),
-            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(maxVoltage));
-    }
-
-    public static LinearSystem<N2, N1, N1> createSingleJointedArmSystem(DCMotor motor, double jKgSquaredMeters, double G, double maxVoltage) {
-        return new LinearSystem<>(Nat.N2(), Nat.N1(), Nat.N1(),
-            new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0, 1,
-                0, -Math.pow(G, 2) * motor.KtNMPerAmp /
-                    (motor.KvRadPerSecPerVolt * motor.Rohms * jKgSquaredMeters)),
-            new MatBuilder<>(Nat.N2(), Nat.N1()).fill(0, (G * motor.KtNMPerAmp / (motor.Rohms * jKgSquaredMeters))),
-            new MatBuilder<>(Nat.N1(), Nat.N2()).fill(1, 0),
-            MatrixUtils.zeros(Nat.N1()),
-            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(-maxVoltage),
-            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(maxVoltage));
-    }
-
-    /**
-     * Identify a velocity system from it's kV (volts/(unit/sec)) and kA (volts/(unit/sec^2).
-     * These constants cam be found using frc-characterization.
-     *
-     * @see <a href="https://github.com/wpilibsuite/frc-characterization"> https://github.com/wpilibsuite/frc-characterization</a>
-     */
-    public static LinearSystem<N1, N1, N1> identifyVelocitySystem(double kV, double kA, double maxVoltage) {
-        return new LinearSystem<>(Nat.N1(), Nat.N1(), Nat.N1(),
-            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(-kV / kA),
-            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(1.0 / kA),
-            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(1.0),
-            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(0.0),
-            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(-maxVoltage),
-            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(maxVoltage));
-    }
-
-    /**
-     * Identify a position system from it's kV (volts/(unit/sec)) and kA (volts/(unit/sec^2).
-     * These constants cam be found using frc-characterization.
-     *
-     * @see <a href="https://github.com/wpilibsuite/frc-characterization"> https://github.com/wpilibsuite/frc-characterization</a>
-     */
-    public static LinearSystem<N2, N1, N1> identifyPositionSystem(double kV, double kA, double maxVoltage) {
-        return new LinearSystem<>(Nat.N2(), Nat.N1(), Nat.N1(),
-            new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0.0, 1.0, 0.0, -kV / kA),
-            new MatBuilder<>(Nat.N2(), Nat.N1()).fill(0.0, 1.0 / kA),
-            new MatBuilder<>(Nat.N1(), Nat.N2()).fill(1.0, 0.0),
-            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(0.0),
-            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(-maxVoltage),
-            new MatBuilder<>(Nat.N1(), Nat.N1()).fill(maxVoltage));
-    }
-
-    /**
-     * Identify a standard differential drive drivetrain, given the drivetrain's
-     * kV and kA in both linear (volts/(meter/sec) and volts/(meter/sec^2)) and
-     * angular (volts/(radian/sec) and volts/(radian/sec^2)) cases. This can be
-     * found using frc-characterization.
-     *
-     * @see <a href="https://github.com/wpilibsuite/frc-characterization"> https://github.com/wpilibsuite/frc-characterization</a>
-     */
-    public static LinearSystem<N2, N2, N2> identifyDrivetrainSystem(
-        double kVLinear, double kALinear, double kVAngular, double kAAngular, double maxVoltage) {
-
-        final double c = 0.5 / (kALinear * kAAngular);
-        final double A1 = c * (-kALinear * kVAngular - kVLinear * kAAngular);
-        final double A2 = c * (kALinear * kVAngular - kVLinear * kAAngular);
-        final double B1 = c * (kALinear + kAAngular);
-        final double B2 = c * (kAAngular - kALinear);
-
-        return new LinearSystem<>(Nat.N2(), Nat.N2(), Nat.N2(),
-            new MatBuilder<>(Nat.N2(), Nat.N2()).fill(A1, A2, A2, A1),
-            new MatBuilder<>(Nat.N2(), Nat.N2()).fill(B1, B2, B2, B1),
-            new MatBuilder<>(Nat.N2(), Nat.N2()).fill(1, 0, 0, 1),
-            new MatBuilder<>(Nat.N2(), Nat.N2()).fill(0, 0, 0, 0),
-            new MatBuilder<>(Nat.N2(), Nat.N1()).fill(-maxVoltage, -maxVoltage),
-            new MatBuilder<>(Nat.N2(), Nat.N1()).fill(maxVoltage, maxVoltage));
     }
 
     @Override

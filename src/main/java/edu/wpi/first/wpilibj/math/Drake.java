@@ -7,51 +7,49 @@
 
 package edu.wpi.first.wpilibj.math;
 
+import edu.wpi.first.wpiutil.math.Matrix;
 import org.ejml.simple.SimpleMatrix;
 
-import edu.wpi.first.wpiutil.math.Matrix;
-import edu.wpi.first.wpiutil.math.Num;
-
 public final class Drake {
-  /**
-   * Solves the discrete alegebraic Riccati equation.
-   *
-   * @param A System matrix.
-   * @param B Input matrix.
-   * @param Q State cost matrix.
-   * @param R Input cost matrix.
-   * @return Solution of DARE.
-   */
-  @SuppressWarnings({"LocalVariableName", "ParameterName"})
-  public static SimpleMatrix discreteAlgebraicRiccatiEquation(
-      SimpleMatrix A,
-      SimpleMatrix B,
-      SimpleMatrix Q,
-      SimpleMatrix R) {
-    var S = new SimpleMatrix(A.numRows(), A.numCols());
-    DrakeJNI.discreteAlgebraicRiccatiEquation(A.getDDRM().getData(), B.getDDRM().getData(),
-        Q.getDDRM().getData(), R.getDDRM().getData(), A.numCols(), B.numCols(),
-        S.getDDRM().getData());
-    return S;
-  }
+    private Drake() {
+    }
 
+    /**
+     * Solves the discrete alegebraic Riccati equation.
+     *
+     * @param A System matrix.
+     * @param B Input matrix.
+     * @param Q State cost matrix.
+     * @param R Input cost matrix.
+     * @return Solution of DARE.
+     */
+    @SuppressWarnings({"LocalVariableName", "ParameterName"})
+    public static SimpleMatrix discreteAlgebraicRiccatiEquation(
+            SimpleMatrix A,
+            SimpleMatrix B,
+            SimpleMatrix Q,
+            SimpleMatrix R) {
+        var S = new SimpleMatrix(A.numRows(), A.numCols());
+        DrakeJNI.discreteAlgebraicRiccatiEquation(A.getDDRM().getData(), B.getDDRM().getData(),
+                Q.getDDRM().getData(), R.getDDRM().getData(), A.numCols(), B.numCols(),
+                S.getDDRM().getData());
+        return S;
+    }
 
-  private Drake() { }
-
-  /**
-   * Solves the discrete alegebraic Riccati equation.
-   *
-   * @param A System matrix.
-   * @param B Input matrix.
-   * @param Q State cost matrix.
-   * @param R Input cost matrix.
-   * @return Solution of DARE.
-   */
-  public static SimpleMatrix discreteAlgebraicRiccatiEquation(
-          Matrix A,
-          Matrix B,
-          Matrix Q,
-          Matrix R) {
-    return discreteAlgebraicRiccatiEquation(A.getStorage(), B.getStorage(), Q.getStorage(), R.getStorage());
-  }
+    /**
+     * Solves the discrete alegebraic Riccati equation.
+     *
+     * @param A System matrix.
+     * @param B Input matrix.
+     * @param Q State cost matrix.
+     * @param R Input cost matrix.
+     * @return Solution of DARE.
+     */
+    public static SimpleMatrix discreteAlgebraicRiccatiEquation(
+            Matrix A,
+            Matrix B,
+            Matrix Q,
+            Matrix R) {
+        return discreteAlgebraicRiccatiEquation(A.getStorage(), B.getStorage(), Q.getStorage(), R.getStorage());
+    }
 }

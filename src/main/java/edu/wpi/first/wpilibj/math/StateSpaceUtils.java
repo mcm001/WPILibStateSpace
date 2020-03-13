@@ -1,14 +1,10 @@
 package edu.wpi.first.wpilibj.math;
 
-import edu.wpi.first.wpilibj.util.Pair;
 import edu.wpi.first.wpiutil.math.Matrix;
 import edu.wpi.first.wpiutil.math.Nat;
 import edu.wpi.first.wpiutil.math.Num;
 import edu.wpi.first.wpiutil.math.SimpleMatrixUtils;
 import edu.wpi.first.wpiutil.math.numbers.N1;
-
-import java.util.Random;
-
 import org.ejml.data.DMatrixRMaj;
 import org.ejml.dense.row.CommonOps_DDRM;
 import org.ejml.dense.row.decomposition.qr.QRDecompositionHouseholder_DDRM;
@@ -16,25 +12,27 @@ import org.ejml.dense.row.factory.DecompositionFactory_DDRM;
 import org.ejml.interfaces.decomposition.CholeskyDecomposition_F64;
 import org.ejml.simple.SimpleMatrix;
 
+import java.util.Random;
+
 public class StateSpaceUtils {
 
     /**
      * Creates a covariance matrix from the given vector for use with Kalman
      * filters.
-     *
+     * <p>
      * Each element is squared and placed on the covariance matrix diagonal.
      *
      * @param stdDevs For a Q matrix, its elements are the standard deviations of
      *                each state from how the model behaves. For an R matrix, its
      *                elements are the standard deviations for each output
      *                measurement.
-     * @return        Process noise or measurement noise covariance matrix.
+     * @return Process noise or measurement noise covariance matrix.
      */
     public static <States extends Num> Matrix<States, States> makeCovMatrix(
             Nat<States> states, Matrix<States, N1> stdDevs
     ) {
         var result = new Matrix<States, States>(new SimpleMatrix(states.getNum(), states.getNum()));
-        for(int i = 0; i < states.getNum(); i++) {
+        for (int i = 0; i < states.getNum(); i++) {
             result.set(i, i, Math.pow(stdDevs.get(i, 0), 2));
         }
         return result;
@@ -46,10 +44,10 @@ public class StateSpaceUtils {
      *
      * @param stdDevs A matrix whose elements are the standard deviations of each
      *                element of the noise vector.
-     * @return        White noise vector.
+     * @return White noise vector.
      */
     public static <N extends Num> Matrix<N, N1> makeWhiteNoiseVector(
-        Nat<N> n, Matrix<N, N1> stdDevs
+            Nat<N> n, Matrix<N, N1> stdDevs
     ) {
         var rand = new Random();
 
@@ -64,7 +62,7 @@ public class StateSpaceUtils {
      * Returns a discretized version of the provided continuous process noise
      * covariance matrix.
      *
-     * @param Q  Continuous process noise covariance matrix.
+     * @param Q         Continuous process noise covariance matrix.
      * @param dtSeconds Discretization timestep.
      */
     public static <States extends Num> Matrix<States, States> discretizeProcessNoiseCov(
@@ -96,8 +94,9 @@ public class StateSpaceUtils {
 
     /**
      * Discretizes the given continuous A matrix.
-     *  @param contA Continuous system matrix.
-     * @param dtSeconds    Discretization timestep.
+     *
+     * @param contA     Continuous system matrix.
+     * @param dtSeconds Discretization timestep.
      * @return the discrete matrix system.
      */
     public static <States extends Num> Matrix<States, States> discretizeA(Matrix<States, States> contA, double dtSeconds) {
@@ -106,18 +105,19 @@ public class StateSpaceUtils {
 
     /**
      * Discretizes the given continuous A and Q matrices.
-     *
+     * <p>
      * Rather than solving a 2N x 2N matrix exponential like in DiscretizeQ() (which
      * is expensive), we take advantage of the structure of the block matrix of A
      * and Q.
-     *
+     * <p>
      * The exponential of A*t, which is only N x N, is relatively cheap.
      * 2) The upper-right quarter of the 2N x 2N matrix, which we can approximate
-     *    using a taylor series to several terms and still be substantially cheaper
-     *    than taking the big exponential.
-     *  @param contA Continuous system matrix.
-     * @param contQ Continuous process noise covariance matrix.
-     * @param dtSeconds    Discretization timestep.
+     * using a taylor series to several terms and still be substantially cheaper
+     * than taking the big exponential.
+     *
+     * @param contA     Continuous system matrix.
+     * @param contQ     Continuous process noise covariance matrix.
+     * @param dtSeconds Discretization timestep.
      * @return a pair representing the discrete system matrix and process noise covariance matrix.
      */
     public static <States extends Num> Pair<Matrix<States, States>, Matrix<States, States>> discretizeAQTaylor(
@@ -156,7 +156,7 @@ public class StateSpaceUtils {
      * Returns a discretized version of the provided continuous measurement noise
      * covariance matrix.
      *
-     * @param R  Continuous measurement noise covariance matrix.
+     * @param R         Continuous measurement noise covariance matrix.
      * @param dtSeconds Discretization timestep.
      */
     public static <Outputs extends Num> Matrix<Outputs, Outputs> discretizeR(Matrix<Outputs, Outputs> R, double dtSeconds) {
@@ -167,7 +167,7 @@ public class StateSpaceUtils {
      * Returns a discretized version of the provided continuous measurement noise
      * covariance matrix.
      *
-     * @param R  Continuous measurement noise covariance matrix.
+     * @param R         Continuous measurement noise covariance matrix.
      * @param dtSeconds Discretization timestep.
      */
     public static <Outputs extends Num> Matrix<Outputs, Outputs> discretizeMeasurementNoiseCov(
@@ -180,7 +180,7 @@ public class StateSpaceUtils {
         var result = new SimpleMatrix(states.getNum(), states.getNum());
         result.fill(0.0);
 
-        for(int i = 0; i < states.getNum(); i++) {
+        for (int i = 0; i < states.getNum(); i++) {
             result.set(i, i, 1.0 / (Math.pow(costs.get(i, 0), 2)));
         }
 
@@ -188,7 +188,7 @@ public class StateSpaceUtils {
     }
 
     public static <States extends Num, Inputs extends Num> void discretizeAB(Nat<States> states, Nat<Inputs> inputs,
-                                                                             Matrix<States,States> a, Matrix<States,Inputs> b,
+                                                                             Matrix<States, States> a, Matrix<States, Inputs> b,
                                                                              double dtSeconds, Matrix<States, States> discA,
                                                                              Matrix<States, Inputs> discB) {
 
@@ -197,11 +197,11 @@ public class StateSpaceUtils {
         var scaledB = b.times(dtSeconds).getStorage();
 
         // i is row
-        for(int i = 0; i < states.getNum(); i++) {
-            for(int j = 0; j < states.getNum(); j++) {
+        for (int i = 0; i < states.getNum(); i++) {
+            for (int j = 0; j < states.getNum(); j++) {
                 Mcont.set(i, j, scaledA.get(i, j));
             }
-            for(int j = 0; j < inputs.getNum(); j++) {
+            for (int j = 0; j < inputs.getNum(); j++) {
                 Mcont.set(i, j + states.getNum(), scaledA.get(i, j));
             }
         }
@@ -221,6 +221,7 @@ public class StateSpaceUtils {
 
     /**
      * The identy of a square matrix
+     *
      * @param rows the number of rows (and columns)
      * @return the identiy matrix, rows x rows.
      */
@@ -231,8 +232,8 @@ public class StateSpaceUtils {
     public static SimpleMatrix lltDecompose(SimpleMatrix src) {
         SimpleMatrix temp = src.copy();
         CholeskyDecomposition_F64<DMatrixRMaj> chol =
-            DecompositionFactory_DDRM.chol(temp.numRows(),true);
-        if( !chol.decompose(temp.getMatrix()))
+                DecompositionFactory_DDRM.chol(temp.numRows(), true);
+        if (!chol.decompose(temp.getMatrix()))
             throw new RuntimeException("Cholesky failed!");
 
         return SimpleMatrix.wrap(chol.getT(null));
@@ -242,36 +243,18 @@ public class StateSpaceUtils {
         var temp = src.copy();
 
         var decomposer = new QRDecompositionHouseholder_DDRM();
-        if(!(decomposer.decompose(temp.getDDRM()))) {
+        if (!(decomposer.decompose(temp.getDDRM()))) {
             throw new RuntimeException("householder decomposition failed!");
         }
 
         return temp;
     }
 
-    public static class Pair<A, B> {
-        private final A m_first;
-        private final B m_second;
-
-        Pair(A first, B second) {
-            m_first = first;
-            m_second = second;
-        }
-
-        public A getFirst() {
-            return m_first;
-        }
-
-        public B getSecond() {
-            return m_second;
-        }
-    }
-
     /**
      * Calculate matrix exponential of a square matrix.
-     *
+     * <p>
      * Implementation from jblas https://github.com/jblas-project/jblas
-     *
+     * <p>
      * A scaled Pade approximation algorithm is used.
      * The algorithm has been directly translated from Golub and Van Loan "Matrix Computations",
      * algorithm 11.3.1. Special Horner techniques from 11.2 are also used to minimize the number
@@ -316,7 +299,7 @@ public class StateSpaceUtils {
          * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
          */
 
-        if(A.numRows() != A.numCols()) {
+        if (A.numRows() != A.numCols()) {
             throw new RuntimeException("A must be square to preform expm!");
         }
 
@@ -346,10 +329,10 @@ public class StateSpaceUtils {
         SimpleMatrix As_6 = As_4.mult(As_2);
         // U = c0*I + c2*A^2 + c4*A^4 + (c6*I + c8*A^2 + c10*A^4 + c12*A^6)*A^6
         SimpleMatrix U = eye(n).scale(c0).plus(As_2.scale(c2)).plus(As_4.scale(c4)).plus(
-            eye(n).scale(c6).plus(As_2.scale(c8)).plus(As_4.scale(c10)).plus(As_6.scale(c12)).mult(As_6));
+                eye(n).scale(c6).plus(As_2.scale(c8)).plus(As_4.scale(c10)).plus(As_6.scale(c12)).mult(As_6));
         // V = c1*I + c3*A^2 + c5*A^4 + (c7*I + c9*A^2 + c11*A^4 + c13*A^6)*A^6
         SimpleMatrix V = eye(n).scale(c1).plus(As_2.scale(c3)).plus(As_4.scale(c5)).plus(
-            eye(n).scale(c7).plus(As_2.scale(c9)).plus(As_4.scale(c11)).plus(As_6.scale(c13)).mult(As_6));
+                eye(n).scale(c7).plus(As_2.scale(c9)).plus(As_4.scale(c11)).plus(As_6.scale(c13)).mult(As_6));
 
         SimpleMatrix AV = As.mult(V);
         SimpleMatrix N = U.plus(AV);
@@ -368,9 +351,9 @@ public class StateSpaceUtils {
     }
 
     public static <N extends Num> Matrix<N, N> exp(
-        Matrix<N, N> A
+            Matrix<N, N> A
     ) {
-        Matrix<N, N> toReturn  = new Matrix<>(new SimpleMatrix(A.getNumRows(), A.getNumCols()));
+        Matrix<N, N> toReturn = new Matrix<>(new SimpleMatrix(A.getNumRows(), A.getNumCols()));
         StateSpaceUtilsJNI.exp(A.getStorage().getDDRM().getData(), A.getNumRows(), toReturn.getStorage().getDDRM().getData());
         return toReturn;
     }
@@ -378,24 +361,42 @@ public class StateSpaceUtils {
     public static SimpleMatrix exp(
             SimpleMatrix A
     ) {
-        SimpleMatrix toReturn  = new SimpleMatrix(A.numRows(), A.numRows());
+        SimpleMatrix toReturn = new SimpleMatrix(A.numRows(), A.numRows());
         StateSpaceUtilsJNI.exp(A.getDDRM().getData(), A.numRows(), toReturn.getDDRM().getData());
         return toReturn;
     }
 
     public static <S extends Num, I extends Num> boolean isStabilizable(
-        Matrix<S, S> A, Matrix<S, I> B
+            Matrix<S, S> A, Matrix<S, I> B
     ) {
         return StateSpaceUtilsJNI.isStabilizable(A.getNumRows(), B.getNumCols(),
-            A.getStorage().getDDRM().getData(), B.getStorage().getDDRM().getData());
+                A.getStorage().getDDRM().getData(), B.getStorage().getDDRM().getData());
     }
 
     public static SimpleMatrix isStabilizable(
-        SimpleMatrix A
+            SimpleMatrix A
     ) {
-        SimpleMatrix toReturn  = new SimpleMatrix(A.numRows(), A.numRows());
+        SimpleMatrix toReturn = new SimpleMatrix(A.numRows(), A.numRows());
         StateSpaceUtilsJNI.exp(A.getDDRM().getData(), A.numRows(), toReturn.getDDRM().getData());
         return toReturn;
+    }
+
+    public static class Pair<A, B> {
+        private final A m_first;
+        private final B m_second;
+
+        Pair(A first, B second) {
+            m_first = first;
+            m_second = second;
+        }
+
+        public A getFirst() {
+            return m_first;
+        }
+
+        public B getSecond() {
+            return m_second;
+        }
     }
 
 }
