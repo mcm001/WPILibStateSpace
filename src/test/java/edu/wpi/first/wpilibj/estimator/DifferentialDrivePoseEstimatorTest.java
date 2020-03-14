@@ -102,10 +102,10 @@ public class DifferentialDrivePoseEstimatorTest {
         System.out.println("Mean error (meters): " + errorSum / (traj.getTotalTimeSeconds() / dt));
         System.out.println("Max error (meters):  " + maxError);
 
-        new SwingWrapper<>(chart).displayChart();
-        try {
-            Thread.sleep(1000000000);
-        } catch (InterruptedException e) {
-        }
+        // new SwingWrapper<>(chart).displayChart();
+        // try {
+        //     Thread.sleep(1000000000);
+        // } catch (InterruptedException e) {
+        // }
     }
 }
