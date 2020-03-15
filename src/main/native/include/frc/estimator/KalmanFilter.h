@@ -49,9 +49,10 @@ class KalmanFilter {
    * @param stateStdDevs       Standard deviations of model states.
    * @param measurementStdDevs Standard deviations of measurements.
    */
-  KalmanFilter(LinearSystem<States, Inputs, Outputs>& plant, units::second_t dt,
+  KalmanFilter(LinearSystem<States, Inputs, Outputs>& plant,
                const std::array<double, States>& stateStdDevs,
-               const std::array<double, Outputs>& measurementStdDevs) {
+               const std::array<double, Outputs>& measurementStdDevs,
+               units::second_t dt) {
     m_plant = &plant;
 
     m_contQ = MakeCovMatrix(stateStdDevs);
