@@ -18,33 +18,6 @@
 
 namespace frc {
 
-/**
- * Ramsete is a nonlinear time-varying feedback controller for unicycle models
- * that drives the model to a desired pose along a two-dimensional trajectory.
- * Why would we need a nonlinear control law in addition to the linear ones we
- * have used so far like PID? If we use the original approach with PID
- * controllers for left and right position and velocity states, the controllers
- * only deal with the local pose. If the robot deviates from the path, there is
- * no way for the controllers to correct and the robot may not reach the desired
- * global pose. This is due to multiple endpoints existing for the robot which
- * have the same encoder path arc lengths.
- *
- * Instead of using wheel path arc lengths (which are in the robot's local
- * coordinate frame), nonlinear controllers like pure pursuit and Ramsete use
- * global pose. The controller uses this extra information to guide a linear
- * reference tracker like the PID controllers back in by adjusting the
- * references of the PID controllers.
- *
- * The paper "Control of Wheeled Mobile Robots: An Experimental Overview"
- * describes a nonlinear controller for a wheeled vehicle with unicycle-like
- * kinematics; a global pose consisting of x, y, and theta; and a desired pose
- * consisting of x_d, y_d, and theta_d. We call it Ramsete because that's the
- * acronym for the title of the book it came from in Italian ("Robotica
- * Articolata e Mobile per i SErvizi e le TEcnologie").
- *
- * See <https://file.tavsys.net/control/controls-engineering-in-frc.pdf> section
- * on Ramsete unicycle controller for a derivation and analysis.
- */
 class LTVUnicycleController {
  public:
   /**
@@ -72,7 +45,7 @@ class LTVUnicycleController {
   void SetTolerance(const Pose2d& poseTolerance);
 
   /**
-   * Returns the next output of the Ramsete controller.
+   * Returns the next output of the controller.
    *
    * The reference pose, linear velocity, and angular velocity should come from
    * a drivetrain trajectory.
@@ -87,7 +60,7 @@ class LTVUnicycleController {
                           units::radians_per_second_t angularVelocityRef);
 
   /**
-   * Returns the next output of the Ramsete controller.
+   * Returns the next output of the controller.
    *
    * The reference pose, linear velocity, and angular velocity should come from
    * a drivetrain trajectory.
