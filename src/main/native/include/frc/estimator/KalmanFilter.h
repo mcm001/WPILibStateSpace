@@ -45,9 +45,9 @@ class KalmanFilter {
    * Constructs a state-space observer with the given plant.
    *
    * @param plant              The plant used for the prediction step.
-   * @param dt                 Nominal discretization timestep.
    * @param stateStdDevs       Standard deviations of model states.
    * @param measurementStdDevs Standard deviations of measurements.
+   * @param dt                 Nominal discretization timestep.
    */
   KalmanFilter(LinearSystem<States, Inputs, Outputs>& plant,
                const std::array<double, States>& stateStdDevs,
@@ -89,6 +89,13 @@ class KalmanFilter {
    * @param j Column of P.
    */
   double P(int i, int j) const { return m_P(i, j); }
+
+  /**
+   * Set the current error covariance matrix P.
+   *
+   * @param P The error covariance matrix P.
+   */
+  void SetP(const Eigen::Matrix<double, States, States>& P) { m_P = P; }
 
   /**
    * Returns the state estimate x-hat.
